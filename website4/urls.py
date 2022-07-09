@@ -3,16 +3,13 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-9 22:6                                                     =
+#    @Time : 2022-7-10 2:24                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : urls.py                                                           =
 #    @Program: website4                                                        =
 # ==============================================================================
-from django.conf import settings
-from django.conf.urls.static import static
-from django.urls import include, path, re_path
-from django.views.generic import TemplateView
+from django.urls import include, path
 from rest_framework import routers
 
 import account.views
@@ -26,14 +23,14 @@ urlpatterns = [  # 管理员系统
 ]
 urlpatterns += [  # api
     # path("api/v1/", include("djoser.urls")),
-    path("api/v1/", include("djoser.urls.authtoken")),
-    path("api/v1/", include(router.urls)),
+    path("", include("djoser.urls.authtoken")),
+    path("", include(router.urls)),
 ]
 
-# 媒体静态文件
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# 媒体静态文件 设计成由django处理但是不由django路由
+# urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # 页面
-urlpatterns += [
-    re_path(r'^.*$', TemplateView.as_view(template_name="index.html"))
-]
+# urlpatterns += [
+#     re_path(r'^.*$', TemplateView.as_view(template_name="index.html"))
+# ]

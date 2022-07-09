@@ -14,7 +14,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-8 19:50                                                    =
+#    @Time : 2022-7-10 2:23                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : prod.py                                                           =
@@ -150,7 +150,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "appfront/dist/static"),
+    # os.path.join(BASE_DIR, "appfront/dist/static"),
 ]
 
 # Default primary key field type
@@ -199,4 +199,4 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_FROM = "Sakuyark"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+# MEDIA_URL = '/media/'
