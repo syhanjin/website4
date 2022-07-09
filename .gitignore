@@ -1,0 +1,18 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+migrations
+
+website4/settings/*
+!website4/settings/__init__.py
+!website4/settings/prod.py
+appfront/*
+!appfront/dist
+media/*
+!media/avatar/default.jpg
+
+.idea
+
+smtp.txt

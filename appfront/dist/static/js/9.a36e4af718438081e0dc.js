@@ -1,0 +1,2 @@
+webpackJsonp([9],{Me9G:function(e,t,n){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var r={render:function(){var e=this,t=e.$createElement,n=e._self._c||t;return n("div",{staticClass:"NotFound"},[n("h2",[e._v("页面走丢了")]),e._v(" "),n("a",{attrs:{href:"#"},on:{click:function(t){return e.$router.back(-1)}}},[e._v("返回上一页")])])},staticRenderFns:[]};var a=n("VU/8")({name:"NotFoundPC"},r,!1,function(e){n("p/rs")},"data-v-103bdec8",null);t.default=a.exports},"p/rs":function(e,t){}});
+//# sourceMappingURL=9.a36e4af718438081e0dc.js.map

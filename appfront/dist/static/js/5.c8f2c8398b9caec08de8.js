@@ -1,0 +1,2 @@
+webpackJsonp([5],{"8o9o":function(e,t,n){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var a={render:function(){var e=this.$createElement;return(this._self._c||e)("div",{staticClass:"home"},[this._v("\n  手机测试\n")])},staticRenderFns:[]};var r=n("VU/8")({name:"HomeViewPC",data:function(){return{}}},a,!1,function(e){n("mjuH")},"data-v-28376b0d",null);t.default=r.exports},mjuH:function(e,t){}});
+//# sourceMappingURL=5.c8f2c8398b9caec08de8.js.map
