@@ -1,11 +1,11 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-9 17:46                                                    =
+#    @Time : 2022-7-12 10:20                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : models.py                                                         =
-#    @Program: website4                                                        =
+#    @Program: website                                                         =
 # ==============================================================================
 import shortuuid
 from django.conf import settings
@@ -86,7 +86,7 @@ class User(AbstractBaseUser, PermissionsMixin, models.Model):
 
     USERNAME_FIELD = 'name'
     REQUIRED_FIELDS = ['email']
-    PUBLIC_FIELDS = ['uuid', 'name', 'avatar', 'signature']
+    PUBLIC_FIELDS = ['uuid', 'name', 'avatar', 'signature', 'admin']
     PRIVATE_FIELDS = ['email', 'created']
     ALL_FIELDS = PUBLIC_FIELDS + PRIVATE_FIELDS
 

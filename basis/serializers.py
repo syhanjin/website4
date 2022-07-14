@@ -3,11 +3,11 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-9 21:1                                                     =
+#    @Time : 2022-7-12 12:36                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : serializers.py                                                    =
-#    @Program: website4                                                        =
+#    @Program: website                                                         =
 # ==============================================================================
 from rest_framework import serializers
 
@@ -39,10 +39,17 @@ class NoticeCreateSerializer(serializers.ModelSerializer):
         return Notice.objects.create(**validated_data)
 
 
-class NoticeDeleteSerializer(serializers.ModelSerializer):
+class NoticeMethodsSerializer(serializers.ModelSerializer):
+    # id = serializers.UUIDField()
+
     class Meta:
         model = Notice
         fields = ('id',)
+
+    def validate_id(self, attr):
+        if Notice.objects.filter(id=attr).count() == 0:
+            raise serializers.ValidationError("指定公告不存在")
+        return attr
 
     pass
 
@@ -51,3 +58,7 @@ class NoticeDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notice
         fields = "__all__"
+
+
+class NoticeCountSerializer(serializers.ModelSerializer):
+    pass

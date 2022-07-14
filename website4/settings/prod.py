@@ -14,11 +14,11 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-10 2:23                                                    =
+#    @Time : 2022-7-12 10:20                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : prod.py                                                           =
-#    @Program: website4                                                        =
+#    @Program: website                                                         =
 # ==============================================================================
 
 import os
@@ -185,7 +185,7 @@ DJOSER = {
             # 直接对djoser的权限进行扩展
             "notice": ["rest_framework.permissions.AllowAny"],
             "notice_create": ["account.permissions.Admin"],
-            "notice_delete": ["account.permissions.Admin"],
+            "notice_methods": ["account.permissions.Admin"],
         }
 
 }
@@ -199,4 +199,6 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_FROM = "Sakuyark"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-# MEDIA_URL = '/media/'
+MEDIA_URL = ''
+
+BASE_URL = ""

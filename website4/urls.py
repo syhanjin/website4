@@ -3,12 +3,14 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-10 2:24                                                    =
+#    @Time : 2022-7-12 10:20                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : urls.py                                                           =
-#    @Program: website4                                                        =
+#    @Program: website                                                         =
 # ==============================================================================
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import include, path
 from rest_framework import routers
 
@@ -23,12 +25,13 @@ urlpatterns = [  # 管理员系统
 ]
 urlpatterns += [  # api
     # path("api/v1/", include("djoser.urls")),
-    path("", include("djoser.urls.authtoken")),
-    path("", include(router.urls)),
+    path(settings.BASE_URL, include("djoser.urls.authtoken")),
+    path(settings.BASE_URL, include(router.urls)),
 ]
 
 # 媒体静态文件 设计成由django处理但是不由django路由
-# urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # 页面
 # urlpatterns += [
