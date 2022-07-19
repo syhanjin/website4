@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-12 10:20                                                   =
+#    @Time : 2022-7-19 17:59                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -42,11 +42,11 @@ class UserViewSet(UserViewSet):
 
     @action(["post"], detail=False, url_path="set_avatar")
     def set_avatar(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        # serializer = self.get_serializer(data=request.data)
+        # serializer.is_valid(raise_exception=True)
         user = self.request.user
         new_avatar = request.FILES['new_avatar']
-        new_avatar.name = random_filename(new_avatar.name)
+        new_avatar.name = random_filename(new_avatar.name, ext="jpg")
         if user.avatar.name != 'avatar/default.jpg':
             user.avatar.delete()
         user.avatar = new_avatar
@@ -62,4 +62,4 @@ class UserViewSet(UserViewSet):
         new_signature = request.data["new_signature"]
         user.signature = new_signature
         user.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(data={'signature': user.signature}, status=status.HTTP_200_OK)

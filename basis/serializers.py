@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-12 12:36                                                   =
+#    @Time : 2022-7-15 12:25                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : serializers.py                                                    =
@@ -58,6 +58,14 @@ class NoticeDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notice
         fields = "__all__"
+
+    author = serializers.SerializerMethodField(read_only=True)
+
+    def get_author(self, obj):
+        return {
+            'name': obj.author.name,
+            'uuid': obj.author.uuid
+        }
 
 
 class NoticeCountSerializer(serializers.ModelSerializer):
