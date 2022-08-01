@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-28 20:36                                                   =
+#    @Time : 2022-8-1 20:40                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : serializers.py                                                    =
@@ -25,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
         return {
             'id': obj.perfection.id,
             'role': obj.perfection.role
-        } if obj.perfection else None
+        } if getattr(obj, 'perfection', None) else None
 
 
 class UserAvatarSerializer(serializers.ModelSerializer):
