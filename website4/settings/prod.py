@@ -14,7 +14,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-19 19:31                                                   =
+#    @Time : 2022-7-30 20:1                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : prod.py                                                           =
@@ -42,6 +42,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
+    'images',
+    'perfection',
     'account',
     'basis',
     'django.contrib.admin',
@@ -53,7 +56,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
-    'corsheaders',
     'imagekit',
 ]
 
@@ -139,7 +141,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'zh-hans'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'GMT'
 
 USE_I18N = True
 
@@ -170,16 +172,16 @@ DJOSER = {
             "activation": ["rest_framework.permissions.AllowAny"],
             "password_reset": ["rest_framework.permissions.AllowAny"],
             "password_reset_confirm": ["rest_framework.permissions.AllowAny"],
-            "set_password": ["djoser.permissions.CurrentUserOrAdmin"],
+            "set_password": ["account.permissions.CurrentUserOrAdmin"],
             "username_reset": ["rest_framework.permissions.AllowAny"],
             "username_reset_confirm": ["rest_framework.permissions.AllowAny"],
-            "set_username": ["djoser.permissions.CurrentUserOrAdmin"],
-            "set_avatar": ["djoser.permissions.CurrentUserOrAdmin"],
-            "set_signature": ["djoser.permissions.CurrentUserOrAdmin"],
+            "set_username": ["account.permissions.CurrentUserOrAdmin"],
+            "set_avatar": ["account.permissions.CurrentUserOrAdmin"],
+            "set_signature": ["account.permissions.CurrentUserOrAdmin"],
             "user_create": ["rest_framework.permissions.AllowAny"],
-            "user_delete": ["djoser.permissions.CurrentUserOrAdmin"],
-            "user": ["djoser.permissions.CurrentUserOrAdmin"],
-            "user_list": ["djoser.permissions.CurrentUserOrAdmin"],
+            "user_delete": ["account.permissions.CurrentUserOrAdmin"],
+            "user": ["account.permissions.CurrentUserOrAdmin"],
+            "user_list": ["account.permissions.CurrentUserOrAdmin"],
             "token_create": ["rest_framework.permissions.AllowAny"],
             "token_destroy": ["rest_framework.permissions.IsAuthenticated"],
             # 直接对djoser的权限进行扩展

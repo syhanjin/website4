@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-12 10:20                                                   =
+#    @Time : 2022-7-27 13:39                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : models.py                                                         =
@@ -87,7 +87,7 @@ class User(AbstractBaseUser, PermissionsMixin, models.Model):
     USERNAME_FIELD = 'name'
     REQUIRED_FIELDS = ['email']
     PUBLIC_FIELDS = ['uuid', 'name', 'avatar', 'signature', 'admin']
-    PRIVATE_FIELDS = ['email', 'created']
+    PRIVATE_FIELDS = ['email', 'created', 'perfection']
     ALL_FIELDS = PUBLIC_FIELDS + PRIVATE_FIELDS
 
     def __str__(self):

@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-19 17:55                                                   =
+#    @Time : 2022-7-28 20:36                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : serializers.py                                                    =
@@ -19,6 +19,14 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = User.ALL_FIELDS
 
+    perfection = serializers.SerializerMethodField(read_only=True)
+
+    def get_perfection(self, obj):
+        return {
+            'id': obj.perfection.id,
+            'role': obj.perfection.role
+        } if obj.perfection else None
+
 
 class UserAvatarSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,6 +34,8 @@ class UserAvatarSerializer(serializers.ModelSerializer):
         fields = ('avatar',)
 
     avatar = serializers.ImageField()
+
+    # avatar = Base64ImageField()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

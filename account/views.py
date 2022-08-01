@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-19 17:59                                                   =
+#    @Time : 2022-7-27 13:43                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -12,18 +12,26 @@
 
 from django.contrib.auth import get_user_model
 from djoser.conf import settings
-from djoser.views import UserViewSet
-from rest_framework import status
+from djoser.views import UserViewSet as BaseUserViewSet
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from account import serializers
-from account.utils import random_filename
+from utils import random_filename
 
 User = get_user_model()
 
 
-class UserViewSet(UserViewSet):
+class UserViewSet(BaseUserViewSet):
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = super(viewsets.ModelViewSet, self).get_queryset()
+        if settings.HIDE_USERS and self.action == "list" and user.admin == 0:
+            queryset = queryset.filter(pk=user.pk)
+        return queryset
+
     def get_permissions(self):
         if self.action == 'set_avatar':
             self.permission_classes = settings.PERMISSIONS.set_avatar
@@ -51,7 +59,7 @@ class UserViewSet(UserViewSet):
             user.avatar.delete()
         user.avatar = new_avatar
         user.save()
-        avatar_addr = user.get_avatar_url()
+        avatar_addr = user.avatar.url
         return Response(data={'avatar': avatar_addr}, status=status.HTTP_200_OK)
 
     @action(["post"], detail=False, url_path="set_signature")

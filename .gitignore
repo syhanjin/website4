@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 
 migrations
+res
 
 website4/settings/*
 !website4/settings/__init__.py
