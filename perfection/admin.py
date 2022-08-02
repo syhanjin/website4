@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-2 17:25                                                    =
+#    @Time : 2022-8-2 17:47                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -41,10 +41,13 @@ def create_words_perfections():
 
 def load_word_list(path):
     """ **调试完成-正常
-    导入单词列表
+    导入单词列表 手动输入词库，出现重复单词将被覆盖
     :param path: 文件(excel)
     :return: 导入数量, 总数
     """
+    lib = input('lib: ')
+    if not lib:
+        return
     word_list = pd.read_excel(path)
     columns = word_list.columns.values.tolist()
     if not {'单词', '词义'} <= set(columns):
@@ -54,7 +57,8 @@ def load_word_list(path):
             defaults={
                 "word": row['单词'],
                 "chinese": row['词义'],
-                "symbol": row.get('音标') or None
+                "symbol": row.get('音标') or None,
+                "lib": lib
             },
             word=row['单词']
         )

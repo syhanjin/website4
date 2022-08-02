@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-1 16:31                                                    =
+#    @Time : 2022-8-2 17:47                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -35,6 +35,7 @@ class Word(models.Model):
     word = models.CharField(max_length=40, verbose_name='英文')
     symbol = models.CharField(max_length=40, verbose_name='音标', null=True)
     chinese = models.CharField(max_length=1000, verbose_name='中文释义')
+    lib = models.CharField(max_length=128, verbose_name='所属词库')
 
     random = models.CharField(max_length=24, primary_key=True, editable=False, unique=True, default=unique_random_str)
     objects = WordManager()
