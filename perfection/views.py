@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-31 17:57                                                   =
+#    @Time : 2022-8-2 17:11                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -129,7 +129,7 @@ class PerfectionStudentViewSet(viewsets.ModelViewSet):
         perfection = serializer.save()
         perfection.user = user
         perfection.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_200_OK)
 
     @action(methods=['get'], detail=False)
     def me(self, request, *args, **kwargs):

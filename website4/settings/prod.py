@@ -14,7 +14,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-30 20:1                                                    =
+#    @Time : 2022-8-2 17:20                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : prod.py                                                           =
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'perfection',
     'account',
     'basis',
+    'django_crontab',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -204,3 +205,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 BASE_URL = "api/v1/"
+
+CRONJOBS = [
+    ('0 6 * * *', 'perfection.admin.create_words_perfections', '>>/home/ubuntu/perfection_create.log')
+]
