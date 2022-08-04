@@ -1,20 +1,21 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-2 17:11                                                    =
+#    @Time : 2022-8-4 14:38                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
 #    @Program: website                                                         =
 # ==============================================================================
-import random
+import io
 
-from django.db.models import QuerySet
-from django.http import HttpResponse
+from django.http import FileResponse
 from django.utils import timezone
-from docx import Document
-from docx.oxml.ns import qn
-from docx.shared import Cm, Pt
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import cm
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus import BalancedColumns, Paragraph, SimpleDocTemplate
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -31,7 +32,98 @@ from .serializers.words import (
     WordsPerfectionSerializer, WordsPerfectionUnrememberedSerializer,
 )
 
+# pdf 生成格式
+pdfmetrics.registerFont(TTFont('霞鹜文楷', 'perfection/fonts/LXGWWenKai-Regular_0.ttf'))
+pdfmetrics.registerFont(TTFont('Consolas', 'perfection/fonts/consola.ttf'))
+pdfmetrics.registerFont(TTFont('ConsolaBd', 'perfection/fonts/consolab.ttf'))
+pdfmetrics.registerFont(TTFont('ConsolaIt', 'perfection/fonts/consolai.ttf'))
+pdfmetrics.registerFont(TTFont('ConsolaBI', 'perfection/fonts/consolaz.ttf'))
+pdfmetrics.registerFontFamily(
+    "Consolas", normal="Consolas", bold="ConsolaBd", italic="ConsolaIt", boldItalic="ConsolaBI"
+)
 
+STYLESHEET = getSampleStyleSheet()
+
+LINE_STYLE = STYLESHEET['Normal']
+LINE_STYLE.spaceAfter = 12
+TITLE_STYLE = STYLESHEET['Title']
+TITLE_STYLE.spaceAfter = 15
+
+
+class PDF_TEMPLATES:
+    class REMEMBER:
+        BODY_HEADER = '<para><font face="霞鹜文楷" size=18>{date}【记忆版】</font></para>'
+        BODY_HEADER_STYLE = TITLE_STYLE
+
+        LINE = '<para>' \
+               '<font face="Consolas" size=16>{index}. {symbol} <b>{word}</b> </font>' \
+               '<font face="霞鹜文楷" size=16>{chinese}</font>' \
+               '<br/></para>'
+        LINE_STYLE = LINE_STYLE
+
+        BODY_FOOTER = ''
+        BODY_FOOTER_STYLE = STYLESHEET['Normal']
+
+    class REVIEW:
+        BODY_HEADER = '<para><font face="霞鹜文楷" size=18>{date}【打卡版】</font></para>'
+        BODY_HEADER_STYLE = TITLE_STYLE
+
+        LINE = '<para>' \
+               '<font face="Consolas" size=12>{index}. {word} ____________________</font>' \
+               '<br/></para>'
+        LINE_STYLE = LINE_STYLE
+
+        BODY_FOOTER = ''
+        BODY_FOOTER_STYLE = STYLESHEET['Normal']
+
+
+def to_pdf(words, date, mode="review"):
+    template = getattr(PDF_TEMPLATES, mode.upper(), None)
+    if template is None:
+        raise ValueError(f"mode={mode}, template={template}")
+    story = [
+        Paragraph(template.BODY_HEADER.format(date=date), template.BODY_HEADER_STYLE)
+    ]
+    body = []
+    for index, word in enumerate(words):
+        body.append(
+            Paragraph(
+                template.LINE.format(
+                    index=index + 1,
+                    word=word.word.word,
+                    symbol=word.word.symbol,
+                    chinese=word.word.chinese
+                ), template.LINE_STYLE
+            )
+        )
+    if mode.lower() == 'review':
+        story.append(
+            BalancedColumns(body, nCols=2)
+        )
+    else:
+        story += body
+    story.append(Paragraph(template.BODY_FOOTER, template.BODY_FOOTER_STYLE))
+    file = io.BytesIO()
+    doc = SimpleDocTemplate(
+        file,
+        topMargin=1.27 * cm, bottomMargin=1.27 * cm,
+        leftMargin=1.27 * cm, rightMargin=1.27 * cm
+    )
+    doc.build(story)
+    return file
+
+
+def to_pdf_resp(words, created, mode):
+    mode2text = {'review': '打卡版', 'remember': '记忆版'}
+    date = created.__format__("%Y-%m-%d")
+    pdf = to_pdf(words=words, date=date, mode=mode)
+    pdf.seek(0)
+    resp = FileResponse(pdf, as_attachment=True, filename=f"""{date}【{mode2text[mode]}】.pdf""")
+    resp.headers["Access-Control-Expose-Headers"] = 'Content-Disposition'
+    return resp
+
+
+"""
 def to_word(words, mode="review"):
     if isinstance(words, QuerySet):
         words = list(words)
@@ -89,6 +181,7 @@ def to_word_response(words, created, mode="review"):
     response["Access-Control-Expose-Headers"] = "Content-Disposition"
     doc.save(response)
     return response
+"""
 
 
 class PerfectionStudentViewSet(viewsets.ModelViewSet):
@@ -219,12 +312,12 @@ class WordsPerfectionViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=True)
     def remember_file(self, request, *args, **kwargs):
         instance = self.get_object()
-        return to_word_response(instance.remember.all(), created=instance.created, mode='remember')
+        return to_pdf_resp(instance.remember.all(), instance.created, mode='remember')
 
     @action(methods=['get'], detail=True)
     def review_file(self, request, *args, **kwargs):
         instance = self.get_object()
-        return to_word_response(instance.remember.all(), created=instance.created, mode='review')
+        return to_pdf_resp(instance.review.all(), instance.created, mode='review')
 
     @action(methods=['get'], detail=True)
     def remember_review(self, request, *args, **kwargs):
