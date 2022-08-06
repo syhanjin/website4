@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-28 20:53                                                   =
+#    @Time : 2022-8-6 14:8                                                     =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : base.py                                                           =
@@ -87,7 +87,8 @@ class PerfectionStudent(models.Model):
 
     @property
     def last_words_finished(self):
-        return self.words.all().order_by("-finished").first().finished
+        latest = self.words.all().order_by("-finished").first()
+        return getattr(latest, 'finished', None)
 
     @property
     def can_add_words_perfection(self):
@@ -101,6 +102,8 @@ class PerfectionStudent(models.Model):
     @property
     def missed_words_perfection(self):
         latest = self.get_latest(self.words)
+        if latest is None:
+            return False
         return (not latest.is_finished) and latest.created.date() != timezone.now().date()
 
     @staticmethod
