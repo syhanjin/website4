@@ -14,7 +14,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-6 14:32                                                    =
+#    @Time : 2022-8-7 12:55                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : prod.py                                                           =
@@ -206,8 +206,8 @@ MEDIA_URL = '/media/'
 
 BASE_URL = "api/v1/"
 
-CRONJOBS = [
-    ('0 6 * * *', 'perfection.admin.create_words_perfections', '>>/home/ubuntu/perfection_create.log'),
-    ('0 12 * * *', 'perfection.admin.create_words_perfections', '>>/home/ubuntu/perfection_create.log'),
-    ('0 18 * * *', 'perfection.admin.create_words_perfections', '>>/home/ubuntu/perfection_create.log'),
-]
+CRONJOBS = []
+for h in range(6, 22):
+    CRONJOBS.append(
+        (f'0 {h} * * *', 'perfection.admin.create_words_perfections', '>>/home/ubuntu/perfection_create.log'),
+    )
