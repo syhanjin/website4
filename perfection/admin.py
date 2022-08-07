@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-7 13:6                                                     =
+#    @Time : 2022-8-7 17:18                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -23,12 +23,17 @@ def create_words_perfections():
     # perfections = PerfectionStudent.objects.filter(can_add_words_perfection=True)
     # 逐个发布打卡
     print(' =' * 10)
-    print(f'检查并发布打卡-{timezone.now().__format__("%Y-%m-%d %H:%M:%S")}')
+    now, rest = timezone.now(), False
+    print(f'检查并发布打卡-{now.__format__("%Y-%m-%d %H:%M:%S")}')
+    if now.weekday() == 6:
+        print("今日为星期日，发布的打卡中将不会有新记单词")
+        rest = True
     add_cnt, miss_cnt = 0, 0
     for perfection in PerfectionStudent.objects.all():
         if perfection.can_add_words_perfection:
             WordsPerfection.objects.create(
                 user=perfection.user,
+                rest=rest
             )
             add_cnt += 1
         elif perfection.missed_words_perfection:
