@@ -14,7 +14,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-7 12:55                                                    =
+#    @Time : 2022-8-7 13:34                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : prod.py                                                           =
@@ -185,10 +185,6 @@ DJOSER = {
             "user_list": ["account.permissions.CurrentUserOrAdmin"],
             "token_create": ["rest_framework.permissions.AllowAny"],
             "token_destroy": ["rest_framework.permissions.IsAuthenticated"],
-            # 直接对djoser的权限进行扩展
-            "notice": ["rest_framework.permissions.AllowAny"],
-            "notice_create": ["account.permissions.Admin"],
-            "notice_methods": ["account.permissions.Admin"],
         }
 
 }

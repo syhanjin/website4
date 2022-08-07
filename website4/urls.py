@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-25 16:7                                                    =
+#    @Time : 2022-8-7 13:55                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : urls.py                                                           =
@@ -21,6 +21,7 @@ import perfection.views
 router = routers.DefaultRouter()
 router.register(r'users', account.views.UserViewSet)
 router.register(r'notice', basis.views.NoticeViewSet)
+router.register(r'app', basis.views.AppViewSet)
 router.register(r'perfection/student', perfection.views.PerfectionStudentViewSet)
 router.register(r'perfection/words', perfection.views.WordsPerfectionViewSet)
 urlpatterns = [  # 管理员系统

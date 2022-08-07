@@ -1,21 +1,23 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-12 12:39                                                   =
+#    @Time : 2022-8-7 14:31                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
 #    @Program: website                                                         =
 # ==============================================================================
-from djoser.conf import settings
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
-from .models import Notice, NoticeTypeChoice
+from .conf import settings
+from .models import App, AppVersion, Notice, NoticeTypeChoice
 from .serializers import (
-    NoticeCountSerializer, NoticeCreateSerializer, NoticeDetailSerializer,
+    AppCreateSerializer, AppSerializer, AppVersionCreateSerializer, AppVersionSerializer, NoticeCountSerializer,
+    NoticeCreateSerializer,
+    NoticeDetailSerializer,
     NoticeMethodsSerializer, NoticeSerializer,
 )
 
@@ -44,7 +46,7 @@ class NoticeViewSet(viewsets.ModelViewSet):
             return NoticeDetailSerializer
         elif self.action == 'count':
             return NoticeCountSerializer
-        return NoticeSerializer
+        return super().get_serializer_class()
 
     def get_permissions(self):
         if self.action == "create":
@@ -95,3 +97,65 @@ class NoticeViewSet(viewsets.ModelViewSet):
             notice.type = NoticeTypeChoice.TOP
         notice.save()
         return Response(status=status.HTTP_200_OK, data={'type': notice.type})
+
+
+# app
+class AppViewSet(viewsets.ModelViewSet):
+    serializer_class = AppSerializer
+    queryset = App.objects.all()
+    permission_classes = settings.PERMISSIONS.app
+    lookup_field = 'id'
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return AppCreateSerializer
+        elif self.action == 'version_create':
+            return AppVersionCreateSerializer
+        elif self.action == 'latest':
+            return AppVersionSerializer
+        return super().get_serializer_class()
+
+    def get_permissions(self):
+        if self.action == "create":
+            self.permission_classes = settings.PERMISSIONS.app_create
+        elif self.action == "version_create":
+            self.permission_classes = settings.PERMISSIONS.app_version_create
+        return super().get_permissions()
+
+    def get_instance(self):
+        return self.request.user
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        app = serializer.save()
+        return Response(
+            status=status.HTTP_200_OK, data={
+                'app_id': app.id
+            }
+        )
+
+    @action(methods=['post'], detail=False)
+    def version_create(self, request, *args, **kwargs):
+        user = self.get_instance()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        app = App.objects.filter(id=data['app_id'])[0]
+        apk = data['apk']
+        apk.name = f"{app.name}-{data['version_name']}.apk"
+        version = AppVersion.objects.create(
+            app=app,
+            version_name=data['version_name'],
+            version_code=data['version_code'],
+            updates=data['updates'],
+            author=user,
+            apk=apk,
+        )
+        return Response(status=status.HTTP_200_OK, data={'apk': request.build_absolute_uri(version.apk.url)})
+
+    @action(methods=['get'], detail=True)
+    def latest(self, request, *args, **kwargs):
+        app = self.get_object()
+        latest = self.get_serializer(instance=app.versions.all().first())
+        return Response(status=status.HTTP_200_OK, data=latest.data)

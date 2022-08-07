@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-7 13:0                                                     =
+#    @Time : 2022-8-7 13:6                                                     =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -22,6 +22,7 @@ def create_words_perfections():
     # 扫描所有打卡学生，选出今天有没有打卡任务且所有任务已完成的人
     # perfections = PerfectionStudent.objects.filter(can_add_words_perfection=True)
     # 逐个发布打卡
+    print(' =' * 10)
     print(f'检查并发布打卡-{timezone.now().__format__("%Y-%m-%d %H:%M:%S")}')
     add_cnt, miss_cnt = 0, 0
     for perfection in PerfectionStudent.objects.all():

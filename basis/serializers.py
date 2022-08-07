@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-15 12:25                                                   =
+#    @Time : 2022-8-7 14:27                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : serializers.py                                                    =
@@ -11,7 +11,7 @@
 # ==============================================================================
 from rest_framework import serializers
 
-from .models import Notice, NoticeTypeChoice
+from .models import App, AppVersion, Notice, NoticeTypeChoice
 
 
 class NoticeSerializer(serializers.ModelSerializer):
@@ -31,12 +31,6 @@ class NoticeCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notice
         fields = Notice.REQUIRED_FIELDS
-
-    def validate(self, attrs):
-        return attrs
-
-    def create(self, validated_data):
-        return Notice.objects.create(**validated_data)
 
 
 class NoticeMethodsSerializer(serializers.ModelSerializer):
@@ -70,3 +64,48 @@ class NoticeDetailSerializer(serializers.ModelSerializer):
 
 class NoticeCountSerializer(serializers.ModelSerializer):
     pass
+
+
+# app
+
+class AppVersionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AppVersion
+        fields = '__all__'
+
+    author = serializers.SerializerMethodField(read_only=True)
+
+    def get_author(self, obj):
+        return {
+            'name': obj.author.name,
+            'uuid': obj.author.uuid
+        }
+
+
+class AppCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = App
+        fields = ('name', 'description')
+
+
+class AppVersionCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AppVersion
+        fields = AppVersion.REQUIRED_FIELDS + ['app_id']
+
+    app_id = serializers.UUIDField()
+    apk = serializers.FileField()
+
+    def validate_app_id(self, attr):
+        if App.objects.filter(id=attr).count() > 0:
+            return attr
+        else:
+            raise serializers.ValidationError("app不存在")
+
+
+class AppSerializer(serializers.ModelSerializer):
+    versions = AppVersionSerializer(many=True)
+
+    class Meta:
+        model = App
+        fields = '__all__'
