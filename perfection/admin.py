@@ -1,13 +1,14 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-2 17:47                                                    =
+#    @Time : 2022-8-7 13:0                                                     =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
 #    @Program: website                                                         =
 # ==============================================================================
 import pandas as pd
+from django.utils import timezone
 
 from perfection.models.base import PerfectionStudent
 from perfection.models.words import Word, WordsPerfection
@@ -21,11 +22,14 @@ def create_words_perfections():
     # 扫描所有打卡学生，选出今天有没有打卡任务且所有任务已完成的人
     # perfections = PerfectionStudent.objects.filter(can_add_words_perfection=True)
     # 逐个发布打卡
+    print(f'检查并发布打卡-{timezone.now().__format__("%Y-%m-%d %H:%M:%S")}')
+    add_cnt, miss_cnt = 0, 0
     for perfection in PerfectionStudent.objects.all():
         if perfection.can_add_words_perfection:
             WordsPerfection.objects.create(
                 user=perfection.user,
             )
+            add_cnt += 1
         elif perfection.missed_words_perfection:
             # 扫描漏打的人并更新打卡内容
             latest = perfection.get_latest(perfection.words)
@@ -35,8 +39,10 @@ def create_words_perfections():
                 if word not in review:
                     latest.review.add(word)
             latest.save()
+            miss_cnt += 1
             # for word in perfection.get_review_words():
             #     latest.review.add(word)
+    print(f'发布完毕！共{add_cnt}个新发布，{miss_cnt}个漏打更新')
 
 
 def load_word_list(path):
