@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-28 20:58                                                   =
+#    @Time : 2022-8-8 18:11                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : conf.py                                                           =
@@ -39,6 +39,8 @@ default_settings = {
         {
             "student": ['perfection.permissions.StudentOrTeacherOrAdmin'],
             "student_create": ['account.permissions.CurrentUserOrAdmin'],
+            "words_library_set": ['perfection.permissions.StudentOrTeacherOrAdmin'],
+            "word_libraries": ["rest_framework.permissions.AllowAny"],
             "words": ['perfection.permissions.StudentOrTeacherOrAdmin'],
             "words_create": ['perfection.permissions.TeacherOrAdmin'],
             "words_finish": ['perfection.permissions.Student']
@@ -46,7 +48,8 @@ default_settings = {
     ),
     "SERIALIZERS": ObjDict(
         {
-            "word_perfection": 'perfection.serializers.words.WordPerfectionSerializer'
+            "word_perfection": 'perfection.serializers.words.WordPerfectionSerializer',
+            "word_library": 'perfection.serializers.words.WordLibrarySerializer'
         }
     )
 }

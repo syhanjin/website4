@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-8 14:5                                                     =
+#    @Time : 2022-8-8 18:28                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -24,11 +24,15 @@ from rest_framework.response import Response
 
 from images.models import Image
 from perfection.models.base import PerfectionStudent
-from perfection.serializers.base import PerfectionStudentCreateSerializer, PerfectionStudentSerializer
+from perfection.serializers.base import (
+    PerfectionStudentCreateSerializer, PerfectionStudentSerializer,
+    PerfectionStudentWordLibrariesSetSerializer,
+)
 from .conf import settings
-from .models.words import WordsPerfection
+from .models.words import WordLibrary, WordsPerfection
 from .serializers.words import (
-    WordsPerfectionFinishSerializer, WordsPerfectionRememberAndReviewSerializer, WordsPerfectionRememberSerializer,
+    WordLibrarySerializer, WordsPerfectionFinishSerializer, WordsPerfectionRememberAndReviewSerializer,
+    WordsPerfectionRememberSerializer,
     WordsPerfectionReviewSerializer,
     WordsPerfectionSerializer, WordsPerfectionUnrememberedSerializer,
 )
@@ -212,11 +216,15 @@ class PerfectionStudentViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'create':
             return PerfectionStudentCreateSerializer
+        elif self.action == 'set_words_library':
+            return PerfectionStudentWordLibrariesSetSerializer
         return super().get_serializer_class()
 
     def get_permissions(self):
         if self.action == 'create':
             self.permission_classes = settings.PERMISSIONS.student_create
+        elif self.action == 'set_words_library':
+            self.permission_classes = settings.PERMISSIONS.words_library_set
         elif self.action == "me":
             self.permission_classes = settings.PERMISSIONS.student
         return super().get_permissions()
@@ -233,6 +241,9 @@ class PerfectionStudentViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         perfection = serializer.save()
         perfection.user = user
+        perfection.word_libraries.set(
+            WordLibrary.objects.filter(is_default__in=[True])
+        )
         perfection.save()
         return Response(status=status.HTTP_200_OK, data={'perfection_id': perfection.id})
 
@@ -241,6 +252,19 @@ class PerfectionStudentViewSet(viewsets.ModelViewSet):
         _object = self.get_instance().perfection
         serializer = self.get_serializer(_object)
         return Response(serializer.data)
+
+    @action(methods=['post'], detail=False)
+    def set_words_library(self, request, *args, **kwargs):
+        _object = self.get_instance().perfection
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        libraries = WordLibrary.objects.filter(id__in=serializer.validated_data['word_libraries'])
+        _object.word_libraries.set(libraries)
+        _object.save()
+        return Response(
+            status=status.HTTP_200_OK,
+            data={'word_libraries': list(_object.word_libraries.all().values_list('name', flat=True))}
+        )
 
 
 class WordsPagination(PageNumberPagination):
@@ -276,11 +300,15 @@ class WordsPerfectionViewSet(viewsets.ModelViewSet):
             return WordsPerfectionRememberAndReviewSerializer
         elif self.action == 'finish':
             return WordsPerfectionFinishSerializer
+        # elif self.action == 'libraries':
+        #     return WordLibraryAllSerializer
         return super().get_serializer_class()
 
     def get_permissions(self):
         if self.action == 'create':
             self.permission_classes = settings.PERMISSIONS.words_create
+        # elif self.action == 'libraries':
+        #     self.permission_classes = settings.PERMISSIONS.word_libraries
         elif (self.action == 'remember' or self.action == 'review'
               or self.action == 'remember_file' or self.action == 'review_file'
               or self.action == 'remember_review' or self.action == 'unremembered'):
@@ -343,6 +371,11 @@ class WordsPerfectionViewSet(viewsets.ModelViewSet):
             data['review'] = [x['word'] for x in data['review']]
         return Response(data=data, status=status.HTTP_200_OK)
 
+    # @action(methods=['get'], detail=False)
+    # def libraries(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer()
+    #     return Response(data=serializer.data, status=status.HTTP_200_OK)
+
     @action(methods=['post'], detail=True)
     def finish(self, request, *args, **kwargs):
         _object = self.get_object()
@@ -387,3 +420,10 @@ class WordsPerfectionViewSet(viewsets.ModelViewSet):
                 "unremembered_words": _object.unremembered_words.values_list('word__word', 'word__chinese')
             }
         )
+
+
+class WordLibraryViewSet(viewsets.ModelViewSet):
+    serializer_class = WordLibrarySerializer
+    queryset = WordLibrary.objects.all()
+    permission_classes = settings.PERMISSIONS.word_libraries
+    lookup_field = 'id'

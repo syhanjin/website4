@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-7 13:55                                                    =
+#    @Time : 2022-8-8 18:17                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : urls.py                                                           =
@@ -24,6 +24,7 @@ router.register(r'notice', basis.views.NoticeViewSet)
 router.register(r'app', basis.views.AppViewSet)
 router.register(r'perfection/student', perfection.views.PerfectionStudentViewSet)
 router.register(r'perfection/words', perfection.views.WordsPerfectionViewSet)
+router.register(r'perfection/word_libraries', perfection.views.WordLibraryViewSet)
 urlpatterns = [  # 管理员系统
     # re_path(r'^admin/', admin.site.urls), # 自己搭一个，这个不用了
 ]

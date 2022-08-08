@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-31 17:51                                                   =
+#    @Time : 2022-8-8 18:27                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -14,7 +14,7 @@ from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
 from images.serializers import ImageSerializer
-from perfection.models.words import WordPerfection, WordsPerfection
+from perfection.models.words import WordLibrary, WordPerfection, WordsPerfection
 
 
 class WordsPerfectionSerializer(serializers.ModelSerializer):
@@ -82,6 +82,17 @@ class WordsPerfectionRememberAndReviewSerializer(serializers.ModelSerializer):
 
     remember = WordPerfectionSerializer(many=True)
     review = WordPerfectionSerializer(many=True)
+
+
+class WordLibrarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WordLibrary
+        fields = ['id', 'name', 'is_default', 'total']
+
+    total = serializers.SerializerMethodField(read_only=True)
+
+    def get_total(self, obj):
+        return obj.words.count()
 
 
 class WordsPerfectionFinishSerializer(serializers.ModelSerializer):

@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-8 9:26                                                     =
+#    @Time : 2022-8-8 18:19                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : base.py                                                           =
@@ -62,6 +62,9 @@ class PerfectionStudent(models.Model):
     unremembered_words = models.ManyToManyField(
         'perfection.WordPerfection', verbose_name="保持词库", related_name='unremembered_perfection'
     )
+    word_libraries = models.ManyToManyField(
+        'perfection.WordLibrary', verbose_name="未记词库", related_name='libraries_perfection'
+    )
     # words = models.ManyToManyField(WordsPerfection, verbose_name="打卡", related_name="perfection")
     # role = models.CharField(
     #     choices=PerfectionRoleChoice.choices, default=PerfectionRoleChoice.STUDENT, max_length=32, editable=False
@@ -71,7 +74,7 @@ class PerfectionStudent(models.Model):
 
     SUMMARY_FIELDS = [
         'user', 'role',
-        'unremembered_words', 'reviewing_words', 'remembered_words'
+        'unremembered_words', 'reviewing_words', 'remembered_words', 'word_libraries'
     ]
 
     def __unicode__(self):

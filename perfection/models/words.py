@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-8 13:52                                                    =
+#    @Time : 2022-8-8 18:25                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -21,6 +21,15 @@ class WordManager(models.Manager):
     pass
 
 
+class WordLibrary(models.Model):
+    class Meta:
+        ordering = ['name']
+
+    id = models.UUIDField(verbose_name="编号", primary_key=True, default=uuid.uuid4, editable=False, max_length=64)
+    name = models.CharField(max_length=128, verbose_name='词库名称')
+    is_default = models.BooleanField(verbose_name="是否为默认词库", default=True)
+
+
 class Word(models.Model):
     """
     说明：此为单词词库中的单词，chinese中包括词性和中文释义
@@ -35,7 +44,9 @@ class Word(models.Model):
     word = models.CharField(max_length=40, verbose_name='英文')
     symbol = models.CharField(max_length=40, verbose_name='音标', null=True)
     chinese = models.CharField(max_length=1000, verbose_name='中文释义')
-    lib = models.CharField(max_length=128, verbose_name='所属词库')
+    library = models.ForeignKey(
+        WordLibrary, max_length=128, verbose_name='所属词库', related_name='words', on_delete=models.CASCADE
+    )
 
     random = models.CharField(max_length=24, primary_key=True, editable=False, unique=True, default=unique_random_str)
     objects = WordManager()
@@ -62,12 +73,13 @@ class WordsPerfectionManager(models.Manager):
             # 首先保证保持词库
             remember = list(unremembered)
             if total > unremembered_count:
-                # 补入未记词库
+                # 补入未记词库的词
                 excludes = list((remembered | reviewing | unremembered).values_list('word__pk', flat=True))
+                library = perfection.word_libraries.all().values_list('words', flat=True)
                 if len(excludes) == 0:
-                    remember_unpack = Word.objects.all()
+                    remember_unpack = library
                 else:
-                    remember_unpack = Word.objects.all().exclude(pk__in=excludes)
+                    remember_unpack = library.exclude(pk__in=excludes)
                 if remember_unpack.count() >= (total - unremembered_count):
                     remember_unpack = remember_unpack[:total - unremembered_count]
                 # 包装

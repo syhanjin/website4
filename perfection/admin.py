@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-8 9:27                                                     =
+#    @Time : 2022-8-8 18:26                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -11,7 +11,7 @@ import pandas as pd
 from django.utils import timezone
 
 from perfection.models.base import PerfectionStudent
-from perfection.models.words import Word, WordsPerfection
+from perfection.models.words import Word, WordLibrary, WordsPerfection
 
 
 def create_words_perfections():
@@ -51,16 +51,32 @@ def create_words_perfections():
 
 
 def load_word_list(path):
-    """ **调试完成-正常
+    """
     导入单词列表 手动输入词库，出现重复单词将被覆盖
     :param path: 文件(excel)
     :return: 导入数量, 总数
     """
-    lib = input('lib: ')
-    if not lib:
+    library_name = input('library: ')
+    if not library_name:
         return
+    library, created = WordLibrary.objects.update_or_create(defaults={"name": library_name}, name=library_name)
+    if created:
+        print(f"已新建词库{library_name}")
+    is_default = input(f'是否设置词库{library_name}为默认词库(Y/n): ')
+    if is_default == '' or is_default.lower() == 'y':
+        is_default = True
+    elif is_default.lower() == 'n':
+        is_default = False
+    else:
+        raise ValueError('输入错误')
+    library.is_default = is_default
+    library.save()
     word_list = pd.read_excel(path)
     columns = word_list.columns.values.tolist()
+    print(
+        f"正在导入{word_list.shape[0]}个单词进入词库[{library.name}]，\n"
+        f"注意：之前已经导入过得单词将从原词库移除并编入该词库，之前的词义将被覆盖"
+    )
     if not {'单词', '词义'} <= set(columns):
         raise ValueError('单词列表文件需包含 “单词” 和 “词义” 两列')
     for idx, row in word_list.iterrows():
@@ -69,9 +85,13 @@ def load_word_list(path):
                 "word": row['单词'],
                 "chinese": row['词义'],
                 "symbol": row.get('音标') or None,
-                "lib": lib
+                "library": library
             },
             word=row['单词']
         )
-
+    print(
+        f"导入完成！\n"
+        f"现总词数：{Word.objects.count()}\n"
+        f"全部词库：{list(WordLibrary.objects.all().values_list('name', flat=True))}"
+    )
     return word_list.shape[0], Word.objects.all().count()

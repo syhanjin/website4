@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-31 18:31                                                   =
+#    @Time : 2022-8-8 18:30                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : base.py                                                           =
@@ -14,6 +14,7 @@ from rest_framework import serializers
 
 from perfection.conf import settings
 from perfection.models.base import PerfectionStudent
+from perfection.models.words import WordLibrary
 
 
 class PerfectionStudentSerializer(serializers.ModelSerializer):
@@ -27,6 +28,7 @@ class PerfectionStudentSerializer(serializers.ModelSerializer):
     unremembered_words = settings.SERIALIZERS.word_perfection(many=True)
     remembered_words = settings.SERIALIZERS.word_perfection(many=True)
     reviewing_words = settings.SERIALIZERS.word_perfection(many=True)
+    word_libraries = settings.SERIALIZERS.word_library(many=True)
 
     has_unfinished_words_perfection = serializers.SerializerMethodField(read_only=True)
     has_missed_words_perfection = serializers.SerializerMethodField(read_only=True)
@@ -59,3 +61,16 @@ class PerfectionStudentRememberedWordsSerializer(serializers.ModelSerializer):
     class Meta:
         model = PerfectionStudent
         fields = ('remembered_words',)
+
+
+class PerfectionStudentWordLibrariesSetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PerfectionStudent
+        fields = ('word_libraries',)
+
+    word_libraries = serializers.ListField(child=serializers.UUIDField(), min_length=1)
+
+    def validate_word_libraries(self, attr):
+        if WordLibrary.objects.filter(id__in=attr).count() != len(attr):
+            raise serializers.ValidationError("有不存在的词库")
+        return attr
