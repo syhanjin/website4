@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-8 18:25                                                    =
+#    @Time : 2022-8-8 20:10                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -12,6 +12,7 @@ import uuid
 from datetime import timedelta
 
 from django.db import models
+from django.db.models import QuerySet
 from django.utils import timezone
 
 from utils import unique_random_str
@@ -75,7 +76,9 @@ class WordsPerfectionManager(models.Manager):
             if total > unremembered_count:
                 # 补入未记词库的词
                 excludes = list((remembered | reviewing | unremembered).values_list('word__pk', flat=True))
-                library = perfection.word_libraries.all().values_list('words', flat=True)
+                library = QuerySet(model=Word)
+                for lib in perfection.word_libraries.all():
+                    library = library | lib.words.all()
                 if len(excludes) == 0:
                     remember_unpack = library
                 else:
