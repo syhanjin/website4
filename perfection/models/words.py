@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-2 19:20                                                    =
+#    @Time : 2022-8-8 9:20                                                     =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -143,6 +143,7 @@ class WordsPerfection(models.Model):
     picture = models.ManyToManyField('images.Image', verbose_name="打卡内容图片", related_name="words")
 
     created = models.DateTimeField(verbose_name="生成打卡任务时间", auto_now_add=True, editable=False)
+    updated = models.DateTimeField(verbose_name="打卡任务更新时间", auto_now_add=True, editable=True)
     finished = models.DateTimeField(verbose_name="完成打卡任务时间", null=True)
     is_finished = models.BooleanField(verbose_name="是否已完成打卡", default=False)
     checked = models.DateTimeField(verbose_name="老师检查打卡时间", null=True)

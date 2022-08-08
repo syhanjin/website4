@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-7 17:18                                                    =
+#    @Time : 2022-8-8 9:27                                                     =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -36,7 +36,7 @@ def create_words_perfections():
                 rest=rest
             )
             add_cnt += 1
-        elif perfection.missed_words_perfection:
+        elif perfection.can_update_words_perfection:
             # 扫描漏打的人并更新打卡内容
             latest = perfection.get_latest(perfection.words)
             review = list(latest.review.all())
@@ -44,10 +44,9 @@ def create_words_perfections():
             for word in review_new:
                 if word not in review:
                     latest.review.add(word)
+            latest.updated = timezone.now()
             latest.save()
             miss_cnt += 1
-            # for word in perfection.get_review_words():
-            #     latest.review.add(word)
     print(f'发布完毕！共{add_cnt}个新发布，{miss_cnt}个漏打更新')
 
 

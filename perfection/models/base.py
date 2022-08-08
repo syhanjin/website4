@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-6 14:8                                                     =
+#    @Time : 2022-8-8 9:26                                                     =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : base.py                                                           =
@@ -105,6 +105,13 @@ class PerfectionStudent(models.Model):
         if latest is None:
             return False
         return (not latest.is_finished) and latest.created.date() != timezone.now().date()
+
+    @property
+    def can_update_words_perfection(self):
+        latest = self.get_latest(self.words)
+        if latest is None:
+            return False
+        return (not latest.is_finished) and latest.updated.date() != timezone.now().date()
 
     @staticmethod
     def get_latest(model):
