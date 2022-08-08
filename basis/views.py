@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-7 14:31                                                    =
+#    @Time : 2022-8-8 19:25                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -149,6 +149,7 @@ class AppViewSet(viewsets.ModelViewSet):
             version_name=data['version_name'],
             version_code=data['version_code'],
             updates=data['updates'],
+            is_force=data['is_force'] == 'true',
             author=user,
             apk=apk,
         )

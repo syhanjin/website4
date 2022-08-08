@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-7 14:13                                                    =
+#    @Time : 2022-8-8 19:26                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : models.py                                                         =
@@ -89,8 +89,9 @@ class AppVersion(models.Model):
     author = models.ForeignKey(User, verbose_name='发布者', null=True, on_delete=models.SET_NULL)
     released = models.DateTimeField(verbose_name="发布时间", auto_now_add=True, editable=False)
     apk = models.FileField(verbose_name="apk", upload_to="apps/")
+    is_force = models.BooleanField(default=False, verbose_name="是否强制更新")
 
-    REQUIRED_FIELDS = ['version_name', 'version_code', 'updates', 'apk']
+    REQUIRED_FIELDS = ['version_name', 'version_code', 'updates', 'apk', 'is_force']
 
     objects = AppVersionManager()
 
