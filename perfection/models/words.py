@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-8 9:20                                                     =
+#    @Time : 2022-8-8 13:52                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -42,7 +42,7 @@ class Word(models.Model):
 
 
 class WordsPerfectionManager(models.Manager):
-    def create(self, *args, **kwargs):
+    def create(self, rest=False, *args, **kwargs):
         user = kwargs.get('user')
         if user is not None:
             perfection = user.perfection
@@ -53,7 +53,7 @@ class WordsPerfectionManager(models.Manager):
                 raise ValueError('必须提供 ‘user’ 或 ‘perfection’')
         # 生成随机单词
         total = 20
-        if not kwargs.get('rest'):
+        if not rest:
             remembered = perfection.remembered_words.all()
             reviewing = perfection.reviewing_words.all()
             unremembered = perfection.unremembered_words.all()

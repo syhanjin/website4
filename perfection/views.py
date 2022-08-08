@@ -1,13 +1,14 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-6 14:19                                                    =
+#    @Time : 2022-8-8 14:5                                                     =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
 #    @Program: website                                                         =
 # ==============================================================================
 import io
+import random
 
 from django.http import FileResponse
 from django.utils import timezone
@@ -15,7 +16,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import cm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import BalancedColumns, Paragraph, SimpleDocTemplate
+from reportlab.platypus import BalancedColumns, PageBreak, Paragraph, SimpleDocTemplate
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -97,9 +98,20 @@ def to_pdf(words, date, mode="review"):
             )
         )
     if mode.lower() == 'review':
-        story.append(
-            BalancedColumns(body, nCols=2)
-        )
+        story.append(BalancedColumns(body, nCols=2))
+        story.append(PageBreak())
+        for index, word in enumerate(words):
+            story.append(
+                Paragraph(
+                    PDF_TEMPLATES.REMEMBER.LINE.format(
+                        index=index + 1,
+                        word=word.word.word,
+                        symbol=word.word.symbol,
+                        chinese=word.word.chinese
+                    ), PDF_TEMPLATES.REMEMBER.LINE_STYLE
+                )
+            )
+
     else:
         story += body
     story.append(Paragraph(template.BODY_FOOTER, template.BODY_FOOTER_STYLE))
@@ -317,7 +329,9 @@ class WordsPerfectionViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=True)
     def review_file(self, request, *args, **kwargs):
         instance = self.get_object()
-        return to_pdf_resp(instance.review.all(), instance.created, mode='review')
+        words = list(instance.review.all())
+        random.shuffle(words)
+        return to_pdf_resp(words, instance.created, mode='review')
 
     @action(methods=['get'], detail=True)
     def remember_review(self, request, *args, **kwargs):
