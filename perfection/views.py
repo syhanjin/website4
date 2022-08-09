@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-8 18:28                                                    =
+#    @Time : 2022-8-9 9:8                                                      =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -10,6 +10,7 @@
 import io
 import random
 
+from django.conf import settings as django_settings
 from django.http import FileResponse
 from django.utils import timezone
 from reportlab.lib.styles import getSampleStyleSheet
@@ -38,11 +39,11 @@ from .serializers.words import (
 )
 
 # pdf 生成格式
-pdfmetrics.registerFont(TTFont('霞鹜文楷', 'perfection/fonts/LXGWWenKai-Regular_0.ttf'))
-pdfmetrics.registerFont(TTFont('Consolas', 'perfection/fonts/consola.ttf'))
-pdfmetrics.registerFont(TTFont('ConsolaBd', 'perfection/fonts/consolab.ttf'))
-pdfmetrics.registerFont(TTFont('ConsolaIt', 'perfection/fonts/consolai.ttf'))
-pdfmetrics.registerFont(TTFont('ConsolaBI', 'perfection/fonts/consolaz.ttf'))
+pdfmetrics.registerFont(TTFont('霞鹜文楷', django_settings.BASE_DIR / 'perfection/fonts/LXGWWenKai-Regular_0.ttf'))
+pdfmetrics.registerFont(TTFont('Consolas', django_settings.BASE_DIR / 'perfection/fonts/consola.ttf'))
+pdfmetrics.registerFont(TTFont('ConsolaBd', django_settings.BASE_DIR / 'perfection/fonts/consolab.ttf'))
+pdfmetrics.registerFont(TTFont('ConsolaIt', django_settings.BASE_DIR / 'perfection/fonts/consolai.ttf'))
+pdfmetrics.registerFont(TTFont('ConsolaBI', django_settings.BASE_DIR / 'perfection/fonts/consolaz.ttf'))
 pdfmetrics.registerFontFamily(
     "Consolas", normal="Consolas", bold="ConsolaBd", italic="ConsolaIt", boldItalic="ConsolaBI"
 )
