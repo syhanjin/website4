@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-9 18:11                                                    =
+#    @Time : 2022-8-10 20:52                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -9,8 +9,9 @@
 # ==============================================================================
 
 from djoser.conf import settings
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
 
 from getui.models import Cid
 from getui.serializers import AuthCidSerializer, CidSerializer
@@ -49,5 +50,5 @@ class CidViewSet(viewsets.ModelViewSet):
         bound, msg = bind_user(serializer.validated_data['cid'], user)
         if not bound:
             raise ValidationError(f"cid绑定失败, msg: {msg}")
-        cid = serializer.save()
-        return cid
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
