@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-27 13:43                                                   =
+#    @Time : 2022-8-9 11:27                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -11,9 +11,10 @@
 # ==============================================================================
 
 from django.contrib.auth import get_user_model
+from djoser import utils
 from djoser.conf import settings
 from djoser.views import UserViewSet as BaseUserViewSet
-from rest_framework import status, viewsets
+from rest_framework import status, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -71,3 +72,19 @@ class UserViewSet(BaseUserViewSet):
         user.signature = new_signature
         user.save()
         return Response(data={'signature': user.signature}, status=status.HTTP_200_OK)
+
+
+class TokenDestroyView(views.APIView):
+    """
+    Use this endpoint to logout user (remove user authentication token).
+    """
+
+    permission_classes = settings.PERMISSIONS.token_destroy
+
+    def post(self, request):
+        utils.logout_user(request)
+        _cid = request.data.get("cid")
+        if _cid:
+            # 需要销毁cid
+            request.user.cids.filter(cid=_cid).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -14,7 +14,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-8 18:35                                                    =
+#    @Time : 2022-8-10 17:35                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : prod.py                                                           =
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'perfection',
     'account',
     'basis',
+    'getui',
     'django_crontab',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -201,11 +202,19 @@ EMAIL_FROM = "Sakuyark"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+HOST_URL = "http://127.0.0.1"
 
 BASE_URL = "api/v1/"
 
 CRONJOBS = []
 for h in range(6, 22):
     CRONJOBS.append(
-        (f'0 {h} * * *', 'perfection.admin.create_words_perfections', '>>/home/ubuntu/perfection_create.log'),
+        (f'0 {h} * * *', 'perfection.admin.create_words_perfections', '>>/home/ubuntu/perfection_create.log 2>&1 &'),
     )
+
+# 个推信息设置
+GETUI_BASE_URL = 'https://restapi.getui.com/v2/'
+APP_ID = '******'
+APP_KEY = '******'
+APP_SECRET = '******'
+MASTER_SECRET = '******'
