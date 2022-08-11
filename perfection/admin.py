@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-11 11:13                                                   =
+#    @Time : 2022-8-11 11:58                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -18,7 +18,7 @@ from getui.servers.push import to_single_batch_alias
 from perfection.models.base import PerfectionStudent
 from perfection.models.words import Word, WordLibrary, WordsPerfection
 
-DELTA = timedelta(minutes=2)
+DELTA = timedelta(minutes=5)
 
 MIM_CHECK_TIME = time(hour=6)
 MAX_CHECK_TIME = time(hour=22, minute=30)
@@ -141,7 +141,7 @@ def create_words_perfections():
             )
     for remind_batch in range(0, len(reminds), 200):
         is_success, msg = to_single_batch_alias(reminds[remind_batch: remind_batch + 200])
-        log.append(f'{is_success}, {msg}')
+        # log.append(f'{is_success}, {msg}')
     log.append(f'发布完毕！共{add_cnt}个新发布，{miss_cnt}个漏打更新，{len(reminds)}条提醒内容')
     if add_cnt + miss_cnt + len(reminds) > 0:
         for i in log:

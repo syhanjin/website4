@@ -14,7 +14,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-11 9:24                                                    =
+#    @Time : 2022-8-11 11:57                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : prod.py                                                           =
@@ -207,7 +207,7 @@ HOST_URL = "http://127.0.0.1"
 BASE_URL = "api/v1/"
 
 CRONJOBS = [
-    ('*/5 * * * *', 'perfection.admin.create_words_perfections', '>>/home/ubuntu/perfection_create.log 2>&1 &')
+    ('*/30 * * * *', 'perfection.admin.create_words_perfections', '>>/home/ubuntu/perfection_create.log 2>&1 &')
 ]
 # 个推信息设置
 GETUI_BASE_URL = 'https://restapi.getui.com/v2/'

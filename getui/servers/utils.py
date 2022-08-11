@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-10 12:1                                                    =
+#    @Time : 2022-8-11 12:54                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : utils.py                                                          =
@@ -25,6 +25,16 @@ def build_headers(token=None):
     if token is not None:
         headers['token'] = token
     return headers
+
+
+def build_options(HW=False, ):
+    data = {}
+    if HW:
+        data["HW"] = {
+            "/message/android/notification/badge/class": "io.dcloud.PandoraEntry",
+            "/message/android/notification/badge/add_num": 1
+        }
+    return data
 
 
 def get_timestamp():
