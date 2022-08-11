@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-11 11:25                                                   =
+#    @Time : 2022-8-11 11:28                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : models.py                                                         =
@@ -111,9 +111,9 @@ class NotificationMessageOnline(models.Model):
     def get_intent(self):
         return "intent://io.dcloud.unipush/?#Intent;scheme=unipush;launchFlags=0x4000000;" \
                "component=com.sakuyark.app/io.dcloud.PandoraEntry;S.UP-OL-SU=true;" \
-               f"S.title={urlencode(self.title)};" \
-               f"S.content={urlencode(self.body)};" \
-               f"S.payload={urlencode(self.payload)};end"
+               f"S.title={urlencode(str(self.title))};" \
+               f"S.content={urlencode(str(self.body))};" \
+               f"S.payload={urlencode(str(self.payload))};end"
 
     def get_notification_json(self):
         res = {
@@ -189,9 +189,9 @@ class NotificationMessageOffline(models.Model):
     def get_intent(self):
         return "intent://io.dcloud.unipush/?#Intent;scheme=unipush;launchFlags=0x4000000;" \
                "component=com.sakuyark.app/io.dcloud.PandoraEntry;S.UP-OL-SU=true;" \
-               f"S.title={urlencode(self.title)};" \
-               f"S.content={urlencode(self.body)};" \
-               f"S.payload={urlencode(self.payload)};end"
+               f"S.title={urlencode(str(self.title))};" \
+               f"S.content={urlencode(str(self.body))};" \
+               f"S.payload={urlencode(str(self.payload))};end"
 
     def get_notification_json(self):
         res = {
