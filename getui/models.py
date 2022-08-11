@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-10 12:22                                                   =
+#    @Time : 2022-8-11 9:52                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : models.py                                                         =
@@ -63,6 +63,7 @@ class NotificationMessageOnline(models.Model):
         ordering = ['-notify_id']
 
     type = "ONLINE"
+    created = models.DateTimeField(verbose_name="生成时间", auto_now_add=True, editable=False)
 
     title = models.CharField(max_length=50, verbose_name="通知消息标题")
 
@@ -168,6 +169,8 @@ class NotificationMessageOffline(models.Model):
         ordering = ['-notify_id']
 
     type = "OFFLINE"
+    created = models.DateTimeField(verbose_name="生成时间", auto_now_add=True, editable=False)
+
     title = models.CharField(max_length=20, verbose_name="通知栏标题")
     body = models.CharField(max_length=50, verbose_name="通知栏内容")
     click_type = models.CharField(max_length=16, choices=ClickTypeOfflineChoice.choices)

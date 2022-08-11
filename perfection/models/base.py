@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-8 18:19                                                    =
+#    @Time : 2022-8-11 9:50                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : base.py                                                           =
@@ -88,6 +88,7 @@ class PerfectionStudent(models.Model):
                 rel.append(word)
         return rel
 
+    # 以下内容在多次调用时可以优化，暂时不进行优化
     @property
     def last_words_finished(self):
         latest = self.words.all().order_by("-finished").first()
@@ -115,6 +116,13 @@ class PerfectionStudent(models.Model):
         if latest is None:
             return False
         return (not latest.is_finished) and latest.updated.date() != timezone.now().date()
+
+    @property
+    def has_unfinished_words_perfection(self):
+        latest = self.get_latest(self.words)
+        if latest is None:
+            return False
+        return not latest.is_finished
 
     @staticmethod
     def get_latest(model):
