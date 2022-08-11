@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-8 18:27                                                    =
+#    @Time : 2022-8-11 20:24                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -90,6 +90,8 @@ class WordLibrarySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'is_default', 'total']
 
     total = serializers.SerializerMethodField(read_only=True)
+
+    # surplus =
 
     def get_total(self, obj):
         return obj.words.count()

@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-11 20:12                                                   =
+#    @Time : 2022-8-11 21:30                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -182,17 +182,17 @@ def load_word_list(path):
         f"正在导入{word_list.shape[0]}个单词进入词库[{library.name}]，\n"
         f"注意：之前已经导入过得单词将从原词库移除并编入该词库，之前的词义将被覆盖"
     )
-    if not {'单词', '词义'} <= set(columns):
-        raise ValueError('单词列表文件需包含 “单词” 和 “词义” 两列')
+    if not {'单词', '词义', '音标'} <= set(columns):
+        raise ValueError('单词列表文件需包含 “单词” “词义” “音标”三列')
     for idx, row in word_list.iterrows():
         Word.objects.update_or_create(
             defaults={
-                "word": row['单词'],
-                "chinese": row['词义'],
-                "symbol": row.get('音标') or None,
+                "word": row['单词'].replace(' ', ""),
+                "chinese": row['词义'].replace(' ', ""),
+                "symbol": row['音标'].replace(' ', ""),
                 "library": library
             },
-            word=row['单词']
+            word=row['单词'].replace(' ', "")
         )
     print(
         f"导入完成！\n"
