@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-11 18:13                                                   =
+#    @Time : 2022-8-11 18:42                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -68,8 +68,10 @@ def create_words_perfections():
             # 构建推送信息
             notification = NotificationMessageOnline.objects.create(
                 title="今日的单词打卡内容已下发，请查收",
-                body=f"共{wp.remember.count()}个新单词，{wp.review.count()}个复习单词\n"
-                     f"今天也要记得按时打卡哦~~",
+                body=f"共{wp.remember.count()}个新单词，{wp.review.count()}个复习单词",
+                big_text=(f"共{wp.remember.count()}个新单词，{wp.review.count()}个复习单词\n"
+                          + ("今天休息，没有新单词，但是该复习的还是得复习哦" if rest else "") + "\n"
+                          + f"今天也要记得按时打卡哦~~"),
                 click_type="intent",
                 payload=json.dumps(
                     {
@@ -99,8 +101,9 @@ def create_words_perfections():
             # 构建推送信息
             notification = NotificationMessageOnline.objects.create(
                 title="您之间漏打的单词打卡已更新",
-                body=f"共{latest.remember.count()}个新单词，{latest.review.count()}个复习单词\n"
-                     f"明日复明日，明日何其多，不如今天就完成吧",
+                body=f"共{latest.remember.count()}个新单词，{latest.review.count()}个复习单词\n",
+                big_text=f"共{latest.remember.count()}个新单词，{latest.review.count()}个复习单词\n"
+                         f"明日复明日，明日何其多，不如今天就完成吧",
                 click_type="intent",
                 payload=json.dumps(
                     {
@@ -125,8 +128,10 @@ def create_words_perfections():
             # 构建推送信息
             notification = NotificationMessageOnline.objects.create(
                 title="今日单词打卡任务未完成",
-                body=f"催打卡啦，催打卡啦，赶快打完卡避免夜长梦多！\n"
-                     f"不要把打卡任务推到明天哦",
+                body="",
+                big_text=("催打卡啦，催打卡啦，赶快打完卡避免夜长梦多！\n"
+                          + ("今天休息，没有新单词，但是该复习的还是得复习，" if rest else "")
+                          + "不要把打卡任务推到明天哦"),
                 click_type="intent",
                 payload=json.dumps(
                     {
