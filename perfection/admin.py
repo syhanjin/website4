@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-11 11:58                                                   =
+#    @Time : 2022-8-11 13:25                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -107,7 +107,8 @@ def create_words_perfections():
                         "action": "open_page",
                         "url": f'/pages/perfection/words/words?wp_id={latest.id}'
                     }
-                )
+                ),
+                channel_level=4
             )
             reminds.append(
                 {
@@ -130,7 +131,8 @@ def create_words_perfections():
                         "action": "open_page",
                         "url": f'/pages/perfection/words/words?wp_id={latest.id}'
                     }
-                )
+                ),
+                channel_level=4
             )
             reminds.append(
                 {
