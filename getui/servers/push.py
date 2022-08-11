@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-10 13:0                                                    =
+#    @Time : 2022-8-11 11:3                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : push.py                                                           =
@@ -145,7 +145,8 @@ def to_list_cid(
         "is_async": is_async
     }
     url = build_url("/push/list/cid")
-    return *send(url, data), taskid
+    is_success, data = send(url, data)
+    return is_success, data, taskid
 
 
 def to_list_alias(
@@ -166,7 +167,8 @@ def to_list_alias(
         "is_async": is_async
     }
     url = build_url("/push/list/alias")
-    return *send(url, data), taskid
+    is_success, data = send(url, data)
+    return is_success, data, taskid
 
 
 def delete_taskid(taskid):
