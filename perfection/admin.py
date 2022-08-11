@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-11 11:1                                                    =
+#    @Time : 2022-8-11 11:13                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -140,7 +140,8 @@ def create_words_perfections():
                 }
             )
     for remind_batch in range(0, len(reminds), 200):
-        to_single_batch_alias(reminds[remind_batch: remind_batch + 200])
+        is_success, msg = to_single_batch_alias(reminds[remind_batch: remind_batch + 200])
+        log.append(f'{is_success}, {msg}')
     log.append(f'发布完毕！共{add_cnt}个新发布，{miss_cnt}个漏打更新，{len(reminds)}条提醒内容')
     if add_cnt + miss_cnt + len(reminds) > 0:
         for i in log:
