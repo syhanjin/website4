@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-9 12:51                                                    =
+#    @Time : 2022-8-11 9:10                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : serializers.py                                                    =
@@ -13,12 +13,8 @@ from rest_framework import serializers
 from getui.models import Cid
 
 
-class AuthCidSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Cid
-        fields = ['user', 'cid']
-
-    cid = serializers.CharField()
+class AuthCidSerializer(serializers.Serializer):
+    cid = serializers.CharField(min_length=32, max_length=32)
 
 
 class CidSerializer(serializers.ModelSerializer):

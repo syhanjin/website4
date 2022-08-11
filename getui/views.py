@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-10 20:52                                                   =
+#    @Time : 2022-8-11 9:17                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -43,12 +43,20 @@ class CidViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         user = self.get_instance()
-        data = request.data.copy()
-        data['user'] = user.pk
-        serializer = self.get_serializer(data=data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        bound, msg = bind_user(serializer.validated_data['cid'], user)
-        if not bound:
+        cid = serializer.validated_data['cid']
+        # 当已存在绑定
+        if Cid.objects.filter(user=user, cid=cid):
+            return Response(status=status.HTTP_200_OK, data={})
+        is_success, msg = bind_user(cid, user)
+        if not is_success:
             raise ValidationError(f"cid绑定失败, msg: {msg}")
-        serializer.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        Cid.objects.update_or_create(
+            defaults={
+                "user": user,
+                "cid": cid
+            },
+            cid=cid
+        )
+        return Response(status=status.HTTP_200_OK, data={})
