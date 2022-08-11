@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-11 11:28                                                   =
+#    @Time : 2022-8-11 11:34                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : models.py                                                         =
@@ -65,7 +65,6 @@ class NotificationMessageOnline(models.Model):
         ordering = ['-notify_id']
 
     type = "ONLINE"
-    created = models.DateTimeField(verbose_name="生成时间", auto_now_add=True, editable=False)
 
     title = models.CharField(max_length=50, verbose_name="通知消息标题")
 
@@ -109,11 +108,9 @@ class NotificationMessageOnline(models.Model):
     objects = NotificationMessageOnlineManager()
 
     def get_intent(self):
-        return "intent://io.dcloud.unipush/?#Intent;scheme=unipush;launchFlags=0x4000000;" \
-               "component=com.sakuyark.app/io.dcloud.PandoraEntry;S.UP-OL-SU=true;" \
-               f"S.title={urlencode(str(self.title))};" \
-               f"S.content={urlencode(str(self.body))};" \
-               f"S.payload={urlencode(str(self.payload))};end"
+        return urlencode(
+            f"intent://io.dcloud.unipush/?#Intent;scheme=unipush;launchFlags=0x4000000;component=com.sakuyark.app/io.dcloud.PandoraEntry;S.UP-OL-SU=true;S.title={self.title};S.content={self.body};S.payload={self.payload};end"
+        )
 
     def get_notification_json(self):
         res = {
@@ -173,8 +170,6 @@ class NotificationMessageOffline(models.Model):
         ordering = ['-notify_id']
 
     type = "OFFLINE"
-    created = models.DateTimeField(verbose_name="生成时间", auto_now_add=True, editable=False)
-
     title = models.CharField(max_length=20, verbose_name="通知栏标题")
     body = models.CharField(max_length=50, verbose_name="通知栏内容")
     click_type = models.CharField(max_length=16, choices=ClickTypeOfflineChoice.choices)
@@ -187,11 +182,9 @@ class NotificationMessageOffline(models.Model):
     objects = NotificationMessageOfflineManager()
 
     def get_intent(self):
-        return "intent://io.dcloud.unipush/?#Intent;scheme=unipush;launchFlags=0x4000000;" \
-               "component=com.sakuyark.app/io.dcloud.PandoraEntry;S.UP-OL-SU=true;" \
-               f"S.title={urlencode(str(self.title))};" \
-               f"S.content={urlencode(str(self.body))};" \
-               f"S.payload={urlencode(str(self.payload))};end"
+        return urlencode(
+            f"intent://io.dcloud.unipush/?#Intent;scheme=unipush;launchFlags=0x4000000;component=com.sakuyark.app/io.dcloud.PandoraEntry;S.UP-OL-SU=true;S.title={self.title};S.content={self.body};S.payload={self.payload};end"
+            )
 
     def get_notification_json(self):
         res = {
