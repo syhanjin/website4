@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-11 11:44                                                   =
+#    @Time : 2022-8-11 14:0                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : models.py                                                         =
@@ -9,7 +9,6 @@
 # ==============================================================================
 from urllib.parse import quote
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -75,10 +74,10 @@ class NotificationMessageOnline(models.Model):
     big_text = models.CharField(max_length=512, verbose_name="长文本消息内容", null=True)
 
     # 大图的URL地址，通知消息+大图样式， 与`big_text`二选一，两个都填写时报错，URL长度 ≤ 1024
-    big_image = models.OneToOneField('images.Image', on_delete=models.SET_NULL, verbose_name="大图", null=True)
+    # big_image = models.OneToOneField('images.Image', on_delete=models.SET_NULL, verbose_name="大图", null=True)
 
     # 通知的图标名称，包含后缀名（需要在客户端开发时嵌入），如“push.png”，长度 ≤ 64
-    logo = models.CharField(max_length=64, verbose_name="通知图标名称", null=True)
+    # logo = models.CharField(max_length=64, verbose_name="通知图标名称", null=True)
 
     channel_id = models.CharField(max_length=64, verbose_name="通知渠道id", default="Default")
 
@@ -127,10 +126,10 @@ class NotificationMessageOnline(models.Model):
         }
         if self.big_text:
             res['big_text'] = self.big_text
-        if self.big_image:
-            res['big_image'] = settings.HOST_URL + self.big_image.image.url
-        if self.logo:
-            res['logo'] = self.logo
+        # if self.big_image:
+        #     res['big_image'] = settings.HOST_URL + self.big_image.image.url
+        # if self.logo:
+        #     res['logo'] = self.logo
         if self.click_type == "intent":
             if not self.payload:
                 raise ValueError("click_type=intent 必须包含payload")
