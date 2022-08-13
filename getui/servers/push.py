@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-13 21:34                                                   =
+#    @Time : 2022-8-13 21:55                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : push.py                                                           =
@@ -23,7 +23,7 @@ def build_push_message(notification):
 
 
 def build_android_channel_message(notification):
-    if notification.type != "offline":
+    if notification.type != "OFFLINE":
         raise ValueError("")
     data = {
         "android": {
