@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-11 11:3                                                    =
+#    @Time : 2022-8-13 21:34                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : push.py                                                           =
@@ -22,18 +22,17 @@ def build_push_message(notification):
     return {"notification": notification.get_notification_json()}
 
 
-def build_android_channel_message(notification, options=None):
+def build_android_channel_message(notification):
     if notification.type != "offline":
         raise ValueError("")
     data = {
         "android": {
             "ups": {
-                "notification": notification.get_notification_json()
+                "notification": notification.get_notification_json(),
+                "options": notification.get_options(['HW'])
             }
         }
     }
-    if options is not None:
-        data["android"]["ups"]["options"] = options
     return data
 
 

@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-11 21:30                                                   =
+#    @Time : 2022-8-13 21:42                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -13,7 +13,7 @@ from datetime import time, timedelta
 import pandas as pd
 from django.utils import timezone
 
-from getui.models import NotificationMessageOnline
+from getui.models import NotificationMessageOffline, NotificationMessageOnline
 from getui.servers.push import to_single_batch_alias
 from perfection.models.base import PerfectionStudent
 from perfection.models.words import Word, WordLibrary, WordsPerfection
@@ -21,7 +21,7 @@ from perfection.models.words import Word, WordLibrary, WordsPerfection
 DELTA = timedelta(minutes=5)
 
 MIM_CHECK_TIME = time(hour=6)
-MAX_CHECK_TIME = time(hour=22, minute=30)
+MAX_CHECK_TIME = time(hour=22, minute=59)
 
 REMIND_TIMES = [
     time(hour=18, minute=00),
@@ -30,6 +30,15 @@ REMIND_TIMES = [
     time(hour=22, minute=00),
     time(hour=22, minute=30)
 ]
+
+
+def _payload(wp):
+    return json.dumps(
+        {
+            "action": "open_page",
+            "url": f'/pages/perfection/words/words?wp_id={wp.id}'
+        }
+    )
 
 
 def create_words_perfections():
@@ -66,23 +75,19 @@ def create_words_perfections():
                 rest=rest
             )
             # 构建推送信息
-            notification = NotificationMessageOnline.objects.create(
-                title="今日的单词打卡内容已下发，请查收",
-                body=f"共{wp.remember.count()}个新单词，{wp.review.count()}个复习单词",
-                big_text=(f"共{wp.remember.count()}个新单词，{wp.review.count()}个复习单词\n"
-                          + ("今天休息，没有新单词，但是该复习的还是得复习哦\n" if rest else "")
-                          + f"今天也要记得按时打卡哦~~"),
-                click_type="intent",
-                payload=json.dumps(
-                    {
-                        "action": "open_page",
-                        "url": f'/pages/perfection/words/words?wp_id={wp.id}'
-                    }
-                )
-            )
+            data = {
+                "title": "今日的单词打卡内容已下发，请查收",
+                "body": f"共{wp.remember.count()}个新单词，{wp.review.count()}个复习单词",
+                "big_text": (f"共{wp.remember.count()}个新单词，{wp.review.count()}个复习单词\n"
+                             + ("今天休息，没有新单词，但是该复习的还是得复习哦\n" if rest else "")
+                             + f"今天也要记得按时打卡哦~~"),
+                "click_type": "intent",
+                "payload": _payload(wp)
+            }
             reminds.append(
                 {
-                    "push": notification,
+                    "push": NotificationMessageOnline.objects.create(**data),
+                    "channel": NotificationMessageOffline.objects.create(**data),
                     "group_name": date_str + "_new",
                     "alias": perfection.user.uuid
                 }
@@ -99,23 +104,18 @@ def create_words_perfections():
             latest.updated = timezone.now()
             latest.save()
             # 构建推送信息
-            notification = NotificationMessageOnline.objects.create(
-                title="您之间漏打的单词打卡已更新",
-                body=f"共{latest.remember.count()}个新单词，{latest.review.count()}个复习单词\n",
-                big_text=f"共{latest.remember.count()}个新单词，{latest.review.count()}个复习单词\n"
-                         f"明日复明日，明日何其多，不如今天就完成吧",
-                click_type="intent",
-                payload=json.dumps(
-                    {
-                        "action": "open_page",
-                        "url": f'/pages/perfection/words/words?wp_id={latest.id}'
-                    }
-                ),
-                channel_level=4
-            )
+            data = {
+                "title": "您之间漏打的单词打卡已更新",
+                "body": f"共{latest.remember.count()}个新单词，{latest.review.count()}个复习单词\n",
+                "big_text": f"共{latest.remember.count()}个新单词，{latest.review.count()}个复习单词\n"
+                            f"明日复明日，明日何其多，不如今天就完成吧",
+                "click_type": "intent",
+                "payload": _payload(latest)
+            }
             reminds.append(
                 {
-                    "push": notification,
+                    "push": NotificationMessageOnline.objects.create(**data),
+                    "channel": NotificationMessageOffline.objects.create(**data),
                     "group_name": date_str + "_update",
                     "alias": perfection.user.uuid
                 }
@@ -124,24 +124,19 @@ def create_words_perfections():
         elif remind and perfection.has_unfinished_words_perfection:
             latest = perfection.get_latest(perfection.words)
             # 构建推送信息
-            notification = NotificationMessageOnline.objects.create(
-                title="今日单词打卡任务未完成",
-                body="",
-                big_text=("催打卡啦，催打卡啦，赶快打完卡避免夜长梦多！\n"
-                          + ("今天休息，没有新单词，但是该复习的还是得复习，" if rest else "")
-                          + "不要把打卡任务推到明天哦"),
-                click_type="intent",
-                payload=json.dumps(
-                    {
-                        "action": "open_page",
-                        "url": f'/pages/perfection/words/words?wp_id={latest.id}'
-                    }
-                ),
-                channel_level=4
-            )
+            data = {
+                "title": "今日单词打卡任务未完成",
+                "body": "催打卡啦，催打卡啦，赶快打完卡避免夜长梦多！",
+                "big_text": ("催打卡啦，催打卡啦，赶快打完卡避免夜长梦多！\n"
+                             + ("今天休息，没有新单词，但是该复习的还是得复习，" if rest else "")
+                             + "不要把打卡任务推到明天哦"),
+                "click_type": "intent",
+                "payload": _payload(latest)
+            }
             reminds.append(
                 {
-                    "push": notification,
+                    "push": NotificationMessageOnline.objects.create(**data),
+                    "channel": NotificationMessageOffline.objects.create(**data),
                     "group_name": date_str + "_urge",
                     "alias": perfection.user.uuid
                 }
