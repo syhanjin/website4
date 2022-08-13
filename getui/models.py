@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-13 21:43                                                   =
+#    @Time : 2022-8-13 21:59                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : models.py                                                         =
@@ -184,7 +184,7 @@ class NotificationMessageOffline(models.Model):
     # 覆盖任务时会使用到该字段，两条消息的`notify_id`相同，新的消息会覆盖老的消息，范围：0-2147483647
     notify_id = models.PositiveIntegerField(editable=False, unique=True, primary_key=True)
 
-    badge_add_num = models.PositiveIntegerField(verbose_name="角标", default=0)
+    badge_add_num = models.PositiveIntegerField(verbose_name="角标", default=1)
     objects = NotificationMessageOfflineManager()
 
     def get_intent(self):
