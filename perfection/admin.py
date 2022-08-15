@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-13 21:42                                                   =
+#    @Time : 2022-8-15 12:14                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -86,7 +86,12 @@ def create_words_perfections():
             }
             reminds.append(
                 {
-                    "push": NotificationMessageOnline.objects.create(**data),
+                    "push": NotificationMessageOnline.objects.create(
+                        **data,
+                        channel_id="Push",
+                        channel_name="Push",
+                        channel_level=4
+                    ),
                     "channel": NotificationMessageOffline.objects.create(**data),
                     "group_name": date_str + "_new",
                     "alias": perfection.user.uuid
@@ -114,7 +119,12 @@ def create_words_perfections():
             }
             reminds.append(
                 {
-                    "push": NotificationMessageOnline.objects.create(**data),
+                    "push": NotificationMessageOnline.objects.create(
+                        **data,
+                        channel_id="Push",
+                        channel_name="Push",
+                        channel_level=4
+                    ),
                     "channel": NotificationMessageOffline.objects.create(**data),
                     "group_name": date_str + "_update",
                     "alias": perfection.user.uuid
@@ -135,7 +145,12 @@ def create_words_perfections():
             }
             reminds.append(
                 {
-                    "push": NotificationMessageOnline.objects.create(**data),
+                    "push": NotificationMessageOnline.objects.create(
+                        **data,
+                        channel_id="Push",
+                        channel_name="Push",
+                        channel_level=4
+                    ),
                     "channel": NotificationMessageOffline.objects.create(**data),
                     "group_name": date_str + "_urge",
                     "alias": perfection.user.uuid

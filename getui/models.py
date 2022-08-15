@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-13 21:59                                                   =
+#    @Time : 2022-8-15 12:48                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : models.py                                                         =
@@ -178,7 +178,7 @@ class NotificationMessageOffline(models.Model):
     body = models.CharField(max_length=50, verbose_name="通知栏内容")
     big_text = models.CharField(max_length=512, verbose_name="长文本", null=True)
     click_type = models.CharField(max_length=16, choices=ClickTypeOfflineChoice.choices)
-    url = models.URLField(max_length=1024)
+    url = models.URLField(max_length=1024, null=True)
     payload = models.CharField(max_length=3836)
 
     # 覆盖任务时会使用到该字段，两条消息的`notify_id`相同，新的消息会覆盖老的消息，范围：0-2147483647
@@ -219,10 +219,10 @@ class NotificationMessageOffline(models.Model):
 
     def get_HW_options(self):
         data = {
-            "/message/android/notification/badge/class": "io.dcloud.PandoraEntry",
-            "/message/android/notification/badge/add_num": self.badge_add_num,
-            "/message/android/notification/style": 1,
+            # "/message/android/notification/badge/class": "io.dcloud.PandoraEntry",
+            # "/message/android/notification/badge/add_num": self.badge_add_num,
+            # "/message/android/notification/style": 1,
             "/message/android/notification/big_body": self.big_text or self.body,
-            "/message/android/notification/default_sound": True
+            # "/message/android/notification/default_sound": True
         }
         return data
