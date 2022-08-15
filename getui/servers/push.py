@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-13 22:31                                                   =
+#    @Time : 2022-8-15 11:5                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : push.py                                                           =
@@ -113,7 +113,7 @@ def to_single_batch_alias(msgs: List[dict], is_async=False):
         msg_data["audience"] = {"alias": [msg["alias"]]}
         data["msg_list"].append(msg_data)
     url = build_url("/push/single/batch/alias")
-    print(data)
+    # print(data)
     return send(url, data)
 
 

@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-31 15:48                                                   =
+#    @Time : 2022-8-15 11:53                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : models.py                                                         =
@@ -28,3 +28,7 @@ class Image(models.Model):
 
     def __unicode__(self):
         return str(self.created)
+
+    @property
+    def url(self):
+        return self.image.url
