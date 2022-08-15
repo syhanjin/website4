@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-15 12:11                                                   =
+#    @Time : 2022-8-15 13:38                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : tests.py                                                          =
@@ -27,7 +27,12 @@ data = {
 }
 reminds = [
     {
-        "push": NotificationMessageOnline.objects.create(**data),
+        "push": NotificationMessageOnline.objects.create(
+            **data,
+            channel_id="Push",
+            channel_name="Push",
+            channel_level=4
+        ),
         "channel": NotificationMessageOffline.objects.create(**data),
         "group_name": "2022-08-15_new",
         "alias": "20864903"

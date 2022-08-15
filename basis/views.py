@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-8 19:25                                                    =
+#    @Time : 2022-8-15 16:23                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -159,4 +159,8 @@ class AppViewSet(viewsets.ModelViewSet):
     def latest(self, request, *args, **kwargs):
         app = self.get_object()
         latest = self.get_serializer(instance=app.versions.all().first())
-        return Response(status=status.HTTP_200_OK, data=latest.data)
+        data = latest.data
+        VersionCode = request.query_params.get('VersionCode')
+        if VersionCode:
+            data['is_force'] = (app.versions.filter(version_code__gt=VersionCode, is_force__in=[True]).count() > 0)
+        return Response(status=status.HTTP_200_OK, data=data)
