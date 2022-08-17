@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-15 16:16                                                   =
+#    @Time : 2022-8-17 16:4                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -62,8 +62,8 @@ class PDF_TEMPLATES:
         BODY_HEADER_STYLE = TITLE_STYLE
 
         LINE = '<para>' \
-               '<font face="Consolas" size=16>{index}. {symbol} <b>{word}</b> </font>' \
-               '<font face="霞鹜文楷" size=16>{chinese}</font>' \
+               '<font face="Consolas" size=12>{index}. {symbol} <b>{word}</b> </font>' \
+               '<font face="霞鹜文楷" size=12>{chinese}</font>' \
                '<br/></para>'
         LINE_STYLE = LINE_STYLE
 
@@ -140,67 +140,6 @@ def to_pdf_resp(words, created, mode):
     return resp
 
 
-"""
-def to_word(words, mode="review"):
-    if isinstance(words, QuerySet):
-        words = list(words)
-    if mode == 'review':
-        random.shuffle(words)
-    fontsize = 12
-    doc = Document()
-    doc.styles['Normal'].font.name = 'Consolas'
-    doc.styles['Normal']._element.rPr.rFonts.set(qn('w:eastAsia'), 'Consolas')
-    doc.styles['Normal'].font.size = Pt(fontsize)
-    if mode == 'review':
-        doc.sections[0]._sectPr.xpath('./w:cols')[0].set(qn('w:num'), '2')
-    doc.sections[0].top_margin = Cm(1.27)
-    doc.sections[0].bottom_margin = Cm(1.27)
-    doc.sections[0].left_margin = Cm(1.27)
-    doc.sections[0].right_margin = Cm(1.27)
-    for index, word in enumerate(words):
-        if mode == 'review':
-            para = doc.add_paragraph()
-            para.add_run('%d. ' % (index + 1))
-            para.add_run(word.word.word + ' ')
-            para.add_run("_" * 15)
-            para.paragraph_format.line_spacing = 1.5
-        elif mode == 'remember':
-            para = doc.add_paragraph()
-            para.add_run('%d. ' % (index + 1))
-            para.add_run(word.word.symbol + ' ')
-            para.add_run(word.word.word + ' ').bold = True
-            para.add_run(word.word.chinese)
-            para.paragraph_format.line_spacing = 1.2
-        para.paragraph_format.space_before = Pt(0)
-        para.paragraph_format.space_after = Pt(0)
-    if mode == 'review':
-        # 加入答案
-        doc.add_section()
-        doc.sections[1]._sectPr.xpath('./w:cols')[0].set(qn('w:num'), '1')
-        for index, word in enumerate(words):
-            para = doc.add_paragraph()
-            para.add_run('%d. ' % (index + 1))
-            para.add_run(word.word.symbol + ' ')
-            para.add_run(word.word.word + ' ').bold = True
-            para.add_run(word.word.chinese)
-            para.paragraph_format.line_spacing = 1.2
-        para.paragraph_format.space_before = Pt(0)
-        para.paragraph_format.space_after = Pt(0)
-    return doc
-
-
-# 生成word文档，该函数并未封装
-def to_word_response(words, created, mode="review"):
-    doc = to_word(words, mode)
-    response = HttpResponse(content_type="application/octet-stream")
-    response["Content-Disposition"] = \
-        f'''attachment; filename={created.__format__("%Y-%m-%d-remember")}.docx'''.encode()
-    response["Access-Control-Expose-Headers"] = "Content-Disposition"
-    doc.save(response)
-    return response
-"""
-
-
 class PerfectionStudentViewSet(viewsets.ModelViewSet):
     serializer_class = PerfectionStudentSerializer
     queryset = PerfectionStudent.objects.all()
@@ -246,7 +185,7 @@ class PerfectionStudentViewSet(viewsets.ModelViewSet):
             WordLibrary.objects.filter(is_default__in=[True])
         )
         perfection.save()
-        return Response(status=status.HTTP_200_OK, data={'perfection_id': perfection.id})
+        return Response(data={'perfection_id': perfection.id})
 
     @action(methods=['get'], detail=False)
     def me(self, request, *args, **kwargs):
@@ -263,7 +202,6 @@ class PerfectionStudentViewSet(viewsets.ModelViewSet):
         _object.word_libraries.set(libraries)
         _object.save()
         return Response(
-            status=status.HTTP_200_OK,
             data={'word_libraries': list(_object.word_libraries.all().values_list('name', flat=True))}
         )
 
