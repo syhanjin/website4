@@ -50,9 +50,6 @@ pdfmetrics.registerFontFamily(
 
 STYLESHEET = getSampleStyleSheet()
 
-REMEMBER_LINE_STYLE = STYLESHEET['Normal']
-REMEMBER_LINE_STYLE.spaceAfter = 0
-REMEMBER_LINE_STYLE.leading = 0
 REVIEW_LINE_STYLE = STYLESHEET['Normal']
 REVIEW_LINE_STYLE.spaceAfter = 12
 TITLE_STYLE = STYLESHEET['Title']
@@ -64,11 +61,11 @@ class PDF_TEMPLATES:
         BODY_HEADER = '<para><font face="霞鹜文楷" size=18>{date}【记忆版】</font></para>'
         BODY_HEADER_STYLE = TITLE_STYLE
 
-        LINE = '<para>' \
+        LINE = '<para spaceAfter=0 spaceBefore=0 leading=12>' \
                '<font face="Consolas" size=12>{index}. {symbol} <b>{word}</b> </font>' \
                '<font face="霞鹜文楷" size=12>{chinese}</font>' \
                '<br/></para>'
-        LINE_STYLE = REMEMBER_LINE_STYLE
+        LINE_STYLE = STYLESHEET['Normal']
 
         BODY_FOOTER = ''
         BODY_FOOTER_STYLE = STYLESHEET['Normal']
