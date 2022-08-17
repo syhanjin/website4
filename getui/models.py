@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-15 12:48                                                   =
+#    @Time : 2022-8-17 10:29                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : models.py                                                         =
@@ -219,8 +219,8 @@ class NotificationMessageOffline(models.Model):
 
     def get_HW_options(self):
         data = {
-            # "/message/android/notification/badge/class": "io.dcloud.PandoraEntry",
-            # "/message/android/notification/badge/add_num": self.badge_add_num,
+            "/message/android/notification/badge/class": "io.dcloud.PandoraEntry",
+            "/message/android/notification/badge/add_num": self.badge_add_num,
             # "/message/android/notification/style": 1,
             "/message/android/notification/big_body": self.big_text or self.body,
             # "/message/android/notification/default_sound": True
