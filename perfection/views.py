@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-17 16:4                                                    =
+#    @Time : 2022-8-17 16:13                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -50,8 +50,10 @@ pdfmetrics.registerFontFamily(
 
 STYLESHEET = getSampleStyleSheet()
 
-LINE_STYLE = STYLESHEET['Normal']
-LINE_STYLE.spaceAfter = 12
+REMEMBER_LINE_STYLE = STYLESHEET['Normal']
+REMEMBER_LINE_STYLE.spaceAfter = 0
+REVIEW_LINE_STYLE = STYLESHEET['Normal']
+REVIEW_LINE_STYLE.spaceAfter = 12
 TITLE_STYLE = STYLESHEET['Title']
 TITLE_STYLE.spaceAfter = 15
 
@@ -65,7 +67,7 @@ class PDF_TEMPLATES:
                '<font face="Consolas" size=12>{index}. {symbol} <b>{word}</b> </font>' \
                '<font face="霞鹜文楷" size=12>{chinese}</font>' \
                '<br/></para>'
-        LINE_STYLE = LINE_STYLE
+        LINE_STYLE = REMEMBER_LINE_STYLE
 
         BODY_FOOTER = ''
         BODY_FOOTER_STYLE = STYLESHEET['Normal']
@@ -77,7 +79,7 @@ class PDF_TEMPLATES:
         LINE = '<para>' \
                '<font face="Consolas" size=12>{index}. {word} ____________________</font>' \
                '<br/></para>'
-        LINE_STYLE = LINE_STYLE
+        LINE_STYLE = REVIEW_LINE_STYLE
 
         BODY_FOOTER = ''
         BODY_FOOTER_STYLE = STYLESHEET['Normal']
