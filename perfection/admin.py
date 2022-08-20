@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-18 10:51                                                   =
+#    @Time : 2022-8-20 15:7                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -76,11 +76,11 @@ def create_words_perfections():
             )
             # 构建推送信息
             data = {
-                "title": "今日的单词打卡内容已下发，请查收",
+                "title": "今日的单词打卡内容已下发，请尽快完成",
                 "body": f"共{wp.remember.count()}个新单词，{wp.review.count()}个复习单词",
                 "big_text": (f"共{wp.remember.count()}个新单词，{wp.review.count()}个复习单词\n"
                              + ("今天休息，没有新单词，但是该复习的还是得复习哦\n" if rest else "")
-                             + f"今天也要记得按时打卡哦~~"),
+                             + f"今天也要记得按时完成打卡任务哦~~"),
                 "click_type": "intent",
                 "payload": _payload(wp)
             }
@@ -110,10 +110,11 @@ def create_words_perfections():
             latest.save()
             # 构建推送信息
             data = {
-                "title": "您之间漏打的单词打卡已更新",
+                "title": "漏打单词内容已更新，请尽快完成",
                 "body": f"共{latest.remember.count()}个新单词，{latest.review.count()}个复习单词\n",
                 "big_text": f"共{latest.remember.count()}个新单词，{latest.review.count()}个复习单词\n"
-                            f"明日复明日，明日何其多，不如今天就完成吧",
+                            f"你已经拖欠打卡{(timezone.now().date() - latest.created.date()).days}天了\n"
+                            f"当天的任务要当天完成，这么拖合适吗？",
                 "click_type": "intent",
                 "payload": _payload(latest)
             }
@@ -136,10 +137,10 @@ def create_words_perfections():
             # 构建推送信息
             data = {
                 "title": "今日单词打卡任务未完成",
-                "body": "催打卡啦，催打卡啦，赶快打完卡避免夜长梦多！",
-                "big_text": ("催打卡啦，催打卡啦，赶快打完卡避免夜长梦多！\n"
+                "body": "催打卡啦，催打卡啦，今日的打卡任务还没完成",
+                "big_text": ("催打卡啦，催打卡啦，今日的打卡任务还没完成\n"
                              + ("今天休息，没有新单词，但是该复习的还是得复习，" if rest else "")
-                             + "不要把打卡任务推到明天哦"),
+                             + "不要把今天的任务推到明天哦"),
                 "click_type": "intent",
                 "payload": _payload(latest)
             }
