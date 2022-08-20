@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-19 16:10                                                   =
+#    @Time : 2022-8-20 14:7                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -304,6 +304,8 @@ class PerfectionClassViewSet(viewsets.ModelViewSet):
         class_ = self.get_object()
         if class_.students.filter(user=user).count() > 0:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'non_field_errors': ['已在班级内']})
+        if user.perfection_student.classes.count() > 0:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'non_field_errors': ['由于某些原因，学生暂时只允许加入一个班级']})
         class_.students.add(user.perfection_student)
         class_.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
