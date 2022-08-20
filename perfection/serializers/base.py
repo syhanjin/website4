@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-8 18:30                                                    =
+#    @Time : 2022-8-18 16:1                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : base.py                                                           =
@@ -25,13 +25,31 @@ class PerfectionStudentSerializer(serializers.ModelSerializer):
             'has_missed_words_perfection'
         ]
 
-    unremembered_words = settings.SERIALIZERS.word_perfection(many=True)
-    remembered_words = settings.SERIALIZERS.word_perfection(many=True)
-    reviewing_words = settings.SERIALIZERS.word_perfection(many=True)
+    # 由于数据量太大，暂时关闭
+    # unremembered_words = settings.SERIALIZERS.word_perfection(many=True)
+    # remembered_words = settings.SERIALIZERS.word_perfection(many=True)
+    # reviewing_words = settings.SERIALIZERS.word_perfection(many=True)
+    user = serializers.SerializerMethodField(read_only=True)
+    unremembered_words = serializers.SerializerMethodField(read_only=True)
+    remembered_words = serializers.SerializerMethodField(read_only=True)
+    reviewing_words = serializers.SerializerMethodField(read_only=True)
+
     word_libraries = settings.SERIALIZERS.word_library(many=True)
 
     has_unfinished_words_perfection = serializers.SerializerMethodField(read_only=True)
     has_missed_words_perfection = serializers.SerializerMethodField(read_only=True)
+
+    def get_user(self, obj):
+        return obj.user.name
+
+    def get_unremembered_words(self, obj):
+        return obj.unremembered_words.count()
+
+    def get_remembered_words(self, obj):
+        return obj.remembered_words.count()
+
+    def get_reviewing_words(self, obj):
+        return obj.reviewing_words.count()
 
     def get_has_unfinished_words_perfection(self, obj):
         latest = obj.get_latest(obj.words)

@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-27 13:39                                                   =
+#    @Time : 2022-8-16 15:44                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : models.py                                                         =
@@ -92,6 +92,15 @@ class User(AbstractBaseUser, PermissionsMixin, models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def perfection(self):
+        if getattr(self, 'perfection_student', None):
+            return self.perfection_student
+        elif getattr(self, 'perfection_teacher', None):
+            return self.perfection_teacher
+        else:
+            return None
 
     def get_avatar_url(self):
         return settings.MEDIA_URL + str(self.avatar)

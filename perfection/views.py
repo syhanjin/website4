@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-17 16:13                                                   =
+#    @Time : 2022-8-19 16:10                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -9,7 +9,9 @@
 # ==============================================================================
 import io
 import random
+from datetime import datetime, time, timedelta
 
+import numpy as np
 from django.conf import settings as django_settings
 from django.http import FileResponse
 from django.utils import timezone
@@ -18,7 +20,7 @@ from reportlab.lib.units import cm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import BalancedColumns, PageBreak, Paragraph, SimpleDocTemplate
-from rest_framework import status, viewsets
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -30,7 +32,18 @@ from perfection.serializers.base import (
     PerfectionStudentWordLibrariesSetSerializer,
 )
 from .conf import settings
+from .models.class_ import PerfectionClass, PerfectionSubject
+from .models.teacher import PerfectionTeacher
 from .models.words import WordLibrary, WordsPerfection
+from .serializers.class_ import (
+    PerfectionClassCreateSerializer, PerfectionClassDetailSerializer, PerfectionClassSerializer,
+    PerfectionClassSubjectCheckSerializer, PerfectionClassSubjectGetSerializer, PerfectionSubjectCreateSerializer,
+    PerfectionSubjectSerializer,
+)
+from .serializers.teacher import (
+    PerfectionTeacherCreateSerializer,
+    PerfectionTeacherSerializer,
+)
 from .serializers.words import (
     WordLibrarySerializer, WordsPerfectionFinishSerializer, WordsPerfectionRememberAndReviewSerializer,
     WordsPerfectionRememberSerializer,
@@ -206,6 +219,235 @@ class PerfectionStudentViewSet(viewsets.ModelViewSet):
         )
 
 
+class PerfectionTeacherViewSet(viewsets.ModelViewSet):
+    serializer_class = PerfectionTeacherSerializer
+    queryset = PerfectionTeacher.objects.all()
+    permission_classes = settings.PERMISSIONS.teacher
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = super().get_queryset()
+        if self.action == "list" and user.admin == 0:
+            queryset = queryset.filter(pk=user.perfection.pk)
+        return queryset
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return PerfectionTeacherCreateSerializer
+        return super().get_serializer_class()
+
+    def get_permissions(self):
+        if self.action == 'create':
+            self.permission_classes = settings.PERMISSIONS.teacher_create
+        return super().get_permissions()
+
+    def get_instance(self):
+        return self.request.user
+
+
+class ClassPagination(PageNumberPagination):
+    # 默认的大小
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 30
+
+
+class PerfectionClassViewSet(viewsets.ModelViewSet):
+    serializer_class = PerfectionClassDetailSerializer
+    queryset = PerfectionClass.objects.all()
+    permission_classes = settings.PERMISSIONS.class_
+    lookup_field = 'id'
+    pagination_class = ClassPagination
+
+    def get_queryset(self):
+        if self.action == 'add':
+            return super().get_queryset()
+        user = self.request.user
+        queryset = user.perfection.classes.all()
+        return queryset
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return PerfectionClassCreateSerializer
+        elif self.action == 'list':
+            return PerfectionClassSerializer
+        return super().get_serializer_class()
+
+    def get_permissions(self):
+        if self.action == 'create':
+            self.permission_classes = settings.PERMISSIONS.class_create
+        elif self.action == 'add':
+            self.permission_classes = settings.PERMISSIONS.class_add
+        return super().get_permissions()
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        class_ = PerfectionClass.objects.create(name=data['name'])
+        class_.subject.set(PerfectionSubject.objects.filter(id__in=data['subject']))
+        class_.teacher = user.perfection_teacher
+        class_.save()
+        return Response(
+            data={
+                "name": class_.name,
+                "id": class_.id,
+                "subject": list(class_.subject.all().values_list('name', flat=True))
+            }
+        )
+
+    @action(methods=['get'], detail=True)
+    def add(self, request, *args, **kwargs):
+        user = request.user
+        class_ = self.get_object()
+        if class_.students.filter(user=user).count() > 0:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={'non_field_errors': ['已在班级内']})
+        class_.students.add(user.perfection_student)
+        class_.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class PerfectionClassSubjectViewSet(
+    mixins.RetrieveModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    serializer_class = PerfectionSubjectSerializer
+    queryset = PerfectionSubject.objects.all()
+    permission_classes = settings.PERMISSIONS.class_subject
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        # print(self.kwargs)
+        return self.get_class().subject.all()
+
+    def get_serializer_class(self):
+        if self.action == 'check':
+            return PerfectionClassSubjectCheckSerializer
+        elif self.action == 'get_one':
+            return PerfectionClassSubjectGetSerializer
+        return super().get_serializer_class()
+
+    def get_permissions(self):
+        if self.action in ['days', 'list_day', 'check', 'get_one']:
+            self.permission_classes = settings.PERMISSIONS.class_subject_manage
+        return super().get_permissions()
+
+    def get_class(self):
+        return PerfectionClass.objects.filter(pk=self.kwargs['class_id']).first()
+
+    def get_qs(self, subject):
+        return getattr(settings.MODELS, f'{subject.id}_perfection').objects.filter(
+            perfection__in=self.get_class().students.all()
+        )
+
+    def get_qs_date(self, subject, date):
+        return self.get_qs(subject).filter(
+            created__range=[  # 唉，这是没办法的事
+                datetime.combine(date, time(0, 0, 0)),
+                datetime.combine(date, time(23, 59, 59, 999))
+            ]
+        )
+
+    @action(methods=['get'], detail=True)
+    def days(self, request, *args, **kwargs):
+        page = int(request.query_params.get('page', 1))
+        page_size = 20
+        subject = self.get_object()
+        date = timezone.now().date() - timedelta(days=(page - 1) * page_size)
+        cnt, data = 0, []
+        class_ = self.get_class()
+        while cnt < page_size:
+            if date < class_.created.date():
+                break
+            day = {
+                "date": date,
+            }
+            qs = self.get_qs_date(subject, date)
+            date -= timedelta(days=1)
+            day["total"] = qs.count()
+            if day["total"] == 0:
+                continue
+            # day["finished"] = qs.filter(is_finished__in=[True]).count()
+            # day["checked"] = qs.filter(is_checked__in=[True]).count()
+            # 主要是上面的数据库过滤不掉（似乎Djongo对boolean的过滤有问题）
+            day["finished"] = np.array(qs.values_list('is_finished', flat=True)).sum()
+            day["checked"] = np.array(qs.values_list('is_checked', flat=True)).sum()
+            data.append(day)
+            cnt += 1
+        return Response(
+            data={
+                "count": len(data),
+                "next": date >= class_.created.date(),
+                "results": data
+            }
+        )
+
+    @action(methods=['get'], detail=True)
+    def list_day(self, request, *args, **kwargs):
+        date = datetime.strptime(request.query_params['date'], '%Y-%m-%d').date()
+        subject = self.get_object()
+        qs = self.get_qs_date(subject, date)
+        serializer = getattr(settings.SERIALIZERS, f'class_{subject.id}_perfection')(qs, many=True)
+        return Response(data=serializer.data)
+
+    @action(methods=['post'], detail=True)
+    def check(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        subject = self.get_object()
+        data = serializer.validated_data
+        _object = self.get_qs(subject).filter(id=data['id']).first()
+        if _object is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={"id": [f"{subject.name}不存在"]})
+        if not _object.is_finished:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST, data={"non_field_errors": [f"该{subject.name}未完成，请等待学生完成后在评价"]}
+            )
+        if _object.is_checked:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={"non_field_errors": [f"该{subject.name}已评价为{_object.rating}，不可修改"]}
+            )
+        _object.rating = data["rating"]
+        _object.is_checked = True
+        _object.checked = timezone.now()
+        # 推送先不做，需要公共提醒模板
+        _object.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(methods=['get'], detail=True)
+    def get_one(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+        subject = self.get_object()
+        data = serializer.validated_data
+        _object = self.get_qs(subject).filter(id=data['id']).first()
+        _serializer = getattr(settings.SERIALIZERS, f'class_{subject.id}_perfection_detail')(
+            _object, context=self.get_serializer_context()
+        )
+        return Response(data=_serializer.data)
+
+
+class PerfectionSubjectViewSet(viewsets.ModelViewSet):
+    serializer_class = PerfectionSubjectSerializer
+    queryset = PerfectionSubject.objects.all()
+    permission_classes = settings.PERMISSIONS.class_subject
+    lookup_field = 'id'
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return PerfectionSubjectCreateSerializer
+        return super().get_serializer_class()
+
+    def get_permissions(self):
+        if self.action == 'create':
+            self.permission_classes = settings.PERMISSIONS.subject_create
+        return super().get_permissions()
+
+
 class WordsPagination(PageNumberPagination):
     # 默认的大小
     page_size = 20
@@ -222,7 +464,7 @@ class WordsPerfectionViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        # if user.admin > 0 or user.perfection.role == 'teacher':
+        # if user.perfection.role == 'teacher':
         #     queryset = super().get_queryset()
         # else:
         queryset = user.perfection.words.all()

@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-11 20:24                                                   =
+#    @Time : 2022-8-19 13:57                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -20,12 +20,13 @@ from perfection.models.words import WordLibrary, WordPerfection, WordsPerfection
 class WordsPerfectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = WordsPerfection
-        fields = WordsPerfection.SUMMARY_FIELDS + ['acc_str', 'acc']
+        fields = WordsPerfection.SUMMARY_FIELDS + ['acc_str', 'acc', 'user']
 
     # picture = serializers.SerializerMethodField(read_only=True)
     picture = ImageSerializer(many=True)
     acc_str = serializers.SerializerMethodField(read_only=True)
     acc = serializers.SerializerMethodField(read_only=True)
+    user = serializers.CharField(source="perfection.user.name")
 
     def get_acc_str(self, obj):
         return obj.accuracy_str
@@ -49,6 +50,17 @@ class WordPerfectionSerializer(serializers.ModelSerializer):
 
     def get_word(self, obj):
         return model_to_dict(obj.word)
+
+
+class WordPerfectionSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WordPerfection
+        fields = ['word', 'symbol', 'chinese', 'library']
+
+    word = serializers.CharField(source='word.word')
+    symbol = serializers.CharField(source='word.symbol')
+    chinese = serializers.CharField(source='word.chinese')
+    library = serializers.CharField(source='word.library.name')
 
 
 class WordsPerfectionRememberSerializer(serializers.ModelSerializer):

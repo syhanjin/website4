@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-15 14:27                                                   =
+#    @Time : 2022-8-18 10:51                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -20,7 +20,7 @@ from perfection.models.words import Word, WordLibrary, WordsPerfection
 
 DELTA = timedelta(minutes=5)
 
-MIM_CHECK_TIME = time(hour=6)
+MIM_CHECK_TIME = time(hour=5, minute=55)
 MAX_CHECK_TIME = time(hour=22, minute=59)
 
 REMIND_TIMES = [

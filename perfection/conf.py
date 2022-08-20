@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-8 18:11                                                    =
+#    @Time : 2022-8-19 13:55                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : conf.py                                                           =
@@ -39,6 +39,15 @@ default_settings = {
         {
             "student": ['perfection.permissions.StudentOrTeacherOrAdmin'],
             "student_create": ['account.permissions.CurrentUserOrAdmin'],
+            "teacher": ['perfection.permissions.TeacherOrAdmin'],
+            "teacher_create": ['account.permissions.AdminSuper'],
+            "class_": ['perfection.permissions.StudentOrTeacherOrAdmin'],
+            "class_add": ['perfection.permissions.Student'],
+            "class_create": ['perfection.permissions.Teacher'],
+            "class_subject": ['perfection.permissions.StudentOrTeacherOrAdmin'],
+            "class_subject_manage": ['perfection.permissions.Teacher'],
+            "subject": ['rest_framework.permissions.AllowAny'],
+            "subject_create": ['account.permissions.AdminSuper'],
             "words_library_set": ['perfection.permissions.StudentOrTeacherOrAdmin'],
             "word_libraries": ["rest_framework.permissions.AllowAny"],
             "words": ['perfection.permissions.StudentOrTeacherOrAdmin'],
@@ -48,8 +57,23 @@ default_settings = {
     ),
     "SERIALIZERS": ObjDict(
         {
+            "class_words_perfection": "perfection.serializers.words.WordsPerfectionSerializer",
+            "class_words_perfection_detail": "perfection.serializers.class_.PerfectionClassWordsPerfectionDetailSerializer",
+            "perfection_student": "perfection.serializers.base.PerfectionStudentSerializer",
+            "words_perfection": "perfection.serializers.words.WordsPerfectionSerializer",
             "word_perfection": 'perfection.serializers.words.WordPerfectionSerializer',
+            "word_perfection_simple": 'perfection.serializers.words.WordPerfectionSimpleSerializer',
             "word_library": 'perfection.serializers.words.WordLibrarySerializer'
+        }
+    ),
+    "MODELS": ObjDict(
+        {
+            "words_perfection": "perfection.models.words.WordsPerfection"
+        }
+    ),
+    "CHOICES": ObjDict(
+        {
+            "rating_choice": "perfection.models.base.RatingChoice"
         }
     )
 }

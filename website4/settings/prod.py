@@ -14,7 +14,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-15 11:47                                                   =
+#    @Time : 2022-8-16 17:31                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : prod.py                                                           =
@@ -44,8 +44,8 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'corsheaders',
     'images',
-    'perfection',
     'account',
+    'perfection',
     'basis',
     'getui',
     'django_crontab',
@@ -60,6 +60,8 @@ INSTALLED_APPS = [
     'djoser',
     'imagekit',
 ]
+
+SILENCED_SYSTEM_CHECKS = ['fields.E300']
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,

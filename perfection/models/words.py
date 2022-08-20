@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-10 20:21                                                   =
+#    @Time : 2022-8-18 16:39                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -15,6 +15,7 @@ from django.db import models
 from django.db.models import QuerySet
 from django.utils import timezone
 
+from perfection.conf import settings
 from utils import unique_random_str
 
 
@@ -163,12 +164,21 @@ class WordsPerfection(models.Model):
     is_finished = models.BooleanField(verbose_name="是否已完成打卡", default=False)
     checked = models.DateTimeField(verbose_name="老师检查打卡时间", null=True)
     is_checked = models.BooleanField(verbose_name="是否检查打卡", default=False)
+    rating = models.CharField(
+        verbose_name="评级", max_length=16, choices=settings.CHOICES.rating_choice.choices, null=True
+    )
+
+    """
+    后来发现这么设计不太合理，但是已经有数据了，要改需要处理数据库的问题
+    以后改版去掉is_finished is_checked
+    使用status判断状态(finished, checking, checked, rejected)
+    """
 
     objects = WordsPerfectionManager()
     REQUIRED_FIELDS = ['perfection', ]
     SUMMARY_FIELDS = [
         'id', 'perfection', 'created',
-        'picture',
+        'picture', 'rating',
         'is_finished', 'finished',
         'is_checked', 'checked'
     ]
@@ -223,11 +233,11 @@ class WordsPerfection(models.Model):
 
     @property
     def accuracy(self):
-        return 1 - (self.unaccepted / self.total)
+        return 1 - (self.unaccepted / self.total) if self.is_finished else None
 
     @property
     def accuracy_str(self):
-        return '%.2f%%' % (self.accuracy * 100)
+        return '%.2f%%' % (self.accuracy * 100) if self.is_finished else None
 
     # def get_picture_url(self):
     #     return settings.MEDIA_URL + str(self.picture)

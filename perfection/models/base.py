@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-11 9:50                                                    =
+#    @Time : 2022-8-17 15:29                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : base.py                                                           =
@@ -17,41 +17,15 @@ from django.utils import timezone
 User = get_user_model()
 
 
-class PerfectionManager(models.Manager):
+class PerfectionStudentManager(models.Manager):
     pass
-
-
-class PerfectionStudentManager(PerfectionManager):
-    pass
-
-
-class PerfectionTeacherManager(PerfectionManager):
-    pass
-
-
-class PerfectionRoleChoice(models.TextChoices):
-    TEACHER = "teacher", "老师"
-    STUDENT = "student", "学生"
-
-
-class Perfection(models.Model):
-    # class Meta:
-    #     ordering = ['created']
-
-    # role = models.CharField(choices=PerfectionRoleChoice.choices, max_length=32)
-
-    # last = models.DateTimeField(verbose_name="上一次打卡时间")
-    REQUIRED_FIELDS = []
-    SUMMARY_FIELDS = ['user']
-
-    def __unicode__(self):
-        return self.user.name + '_PERFECTION'
 
 
 class PerfectionStudent(models.Model):
     id = models.UUIDField(verbose_name="编号", primary_key=True, default=uuid.uuid4, editable=False, max_length=64)
 
-    user = models.OneToOneField(to=User, related_name="perfection", on_delete=models.CASCADE)
+    user = models.OneToOneField(to=User, related_name="perfection_student", on_delete=models.CASCADE)
+    teachers = models.ManyToManyField('perfection.PerfectionTeacher', related_name="students")
     # 单词打卡部分
     remembered_words = models.ManyToManyField(
         'perfection.WordPerfection', verbose_name="完成词库", related_name='remembered_perfection'
@@ -69,7 +43,7 @@ class PerfectionStudent(models.Model):
     # role = models.CharField(
     #     choices=PerfectionRoleChoice.choices, default=PerfectionRoleChoice.STUDENT, max_length=32, editable=False
     # )
-    role = PerfectionRoleChoice.STUDENT
+    role = 'student'
     objects = PerfectionStudentManager()
 
     SUMMARY_FIELDS = [
@@ -127,3 +101,8 @@ class PerfectionStudent(models.Model):
     @staticmethod
     def get_latest(model):
         return model.all().order_by("-created").first()
+
+
+class RatingChoice(models.TextChoices):
+    PASS = "pass", "通过"
+    FAIL = "fail", "不通过"

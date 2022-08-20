@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-28 20:52                                                   =
+#    @Time : 2022-8-17 13:56                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : permissions.py                                                    =
@@ -24,10 +24,11 @@ class NoPerfection(APIException):
 class _Perfection(BasePermission):
 
     def has_permission(self, request, view):
+        # print(request.user)
         if not bool(
                 request.user
                 and request.user.is_authenticated
-                and getattr(request.user, 'perfection', None)
+                and request.user.perfection
         ):
             raise NoPerfection
         return True
@@ -56,6 +57,6 @@ Teacher = _Perfection & _Teacher
 
 StudentOrTeacher = Student | Teacher
 StudentOrAdmin = Student | AdminSuper
-TeacherOrAdmin = Student | AdminSuper
+TeacherOrAdmin = Teacher | AdminSuper
 StudentOrTeacherOrAdmin = Student | Teacher | AdminSuper
 # CurrentStudentOrCurrentTeacherOrAdmin = CurrentStudent | CurrentTeacher | AdminSuper
