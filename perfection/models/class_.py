@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-18 13:0                                                    =
+#    @Time : 2022-8-21 19:25                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : class_.py                                                         =
@@ -33,7 +33,16 @@ class PerfectionClass(models.Model):
     id = models.CharField(verbose_name="班级id", primary_key=True, default=_id, editable=False, max_length=8)
     created = models.DateTimeField(verbose_name="创建时间", auto_now_add=True, editable=False)
     name = models.CharField(verbose_name="班级名称", max_length=64)
-    students = models.ManyToManyField('perfection.PerfectionStudent', related_name='classes')
+    # students = models.ManyToManyField('perfection.PerfectionStudent', related_name='classes')
+    students = models.ManyToManyField(
+        'perfection.PerfectionStudent', through='PerfectionClassStudent', related_name="classes"
+    )
     teacher = models.ForeignKey('perfection.PerfectionTeacher', related_name='classes', on_delete=models.CASCADE)
     subject = models.ManyToManyField(PerfectionSubject, related_name='classes')
     objects = PerfectionClassManager()
+
+
+class PerfectionClassStudent(models.Model):
+    c = models.ForeignKey(PerfectionClass, on_delete=models.CASCADE)
+    p = models.ForeignKey("perfection.PerfectionStudent", on_delete=models.CASCADE)
+    nickname = models.CharField(max_length=64)

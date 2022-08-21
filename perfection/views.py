@@ -1,15 +1,17 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-20 14:7                                                    =
+#    @Time : 2022-8-21 20:6                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
 #    @Program: website                                                         =
 # ==============================================================================
 import io
+import json
 import random
 from datetime import datetime, time, timedelta
+from urllib.parse import quote
 
 import numpy as np
 from django.conf import settings as django_settings
@@ -25,6 +27,8 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
+from getui.models import NotificationMessageOffline, NotificationMessageOnline
+from getui.servers.push import to_single_alias
 from images.models import Image
 from perfection.models.base import PerfectionStudent
 from perfection.serializers.base import (
@@ -32,7 +36,7 @@ from perfection.serializers.base import (
     PerfectionStudentWordLibrariesSetSerializer,
 )
 from .conf import settings
-from .models.class_ import PerfectionClass, PerfectionSubject
+from .models.class_ import PerfectionClass, PerfectionClassStudent, PerfectionSubject
 from .models.teacher import PerfectionTeacher
 from .models.words import WordLibrary, WordsPerfection
 from .serializers.class_ import (
@@ -306,8 +310,9 @@ class PerfectionClassViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'non_field_errors': ['已在班级内']})
         if user.perfection_student.classes.count() > 0:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'non_field_errors': ['由于某些原因，学生暂时只允许加入一个班级']})
-        class_.students.add(user.perfection_student)
-        class_.save()
+        # class_.students.add(user.perfection_student)
+        # class_.save()
+        PerfectionClassStudent.objects.create(c=class_, p=user.perfection)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -592,6 +597,40 @@ class WordsPerfectionViewSet(viewsets.ModelViewSet):
         _object.is_finished = True
         _object.finished = timezone.now()
         _object.save()
+        # 向老师发送提醒
+        for class_ in _object.perfection.classes.filter(subject__id="words"):
+            date_str = _object.created.__format__('%Y-%m-%d')
+            data = {
+                "title": f"{_object.perfection.user.name}已提交打卡，请及时批改",
+                "body": f"班级：{class_.name}({class_.id})学员[{_object.perfection.user.name}]已提交"
+                        f"{date_str}日单词打卡，请及时批改",
+                "big_text": f"班级：{class_.name}({class_.id})学员[{_object.perfection.user.name}]已提交"
+                            f"{_object.created.__format__('%Y-%m-%d')}日单词打卡，请及时批改",
+                "click_type": "intent",
+                "payload": json.dumps(
+                    {
+                        "action": "open_page",
+                        "url": f"/pages/perfection/teacher/class/subject/check"
+                               f"?id={_object.id}"
+                               f"&date={date_str}"
+                               f"&class_id={class_.id}"
+                               f"&sn={quote('单词打卡')}"
+                               f"&subject=words"
+                    }
+                )
+            }
+            # print(data["payload"])
+            to_single_alias(
+                push=NotificationMessageOnline.objects.create(
+                    **data,
+                    channel_id="Push",
+                    channel_name="Push",
+                    channel_level=4
+                ),
+                channel=NotificationMessageOffline.objects.create(**data),
+                group_name=date_str + '_teacher',
+                alias=class_.teacher.user.uuid
+            )
         picture = []
         for pic in _object.picture.all():
             picture.append(request.build_absolute_uri(pic.image.url))

@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-20 15:7                                                    =
+#    @Time : 2022-8-21 19:11                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -22,6 +22,10 @@ DELTA = timedelta(minutes=5)
 
 MIM_CHECK_TIME = time(hour=5, minute=55)
 MAX_CHECK_TIME = time(hour=22, minute=59)
+TIME_RANGE = (
+    time(hour=5, minute=55),
+    time(hour=22, minute=35),
+)
 
 REMIND_TIMES = [
     time(hour=18, minute=00),
@@ -30,6 +34,13 @@ REMIND_TIMES = [
     time(hour=22, minute=00),
     time(hour=22, minute=30)
 ]
+
+
+def _is_remind(t):
+    for _time in REMIND_TIMES:
+        if (t - DELTA).time() <= _time <= (t + DELTA).time():
+            return True
+    return False
 
 
 def _payload(wp):
@@ -41,6 +52,100 @@ def _payload(wp):
     )
 
 
+def _create_remind(data, alias, group_name):
+    return {
+        "push": NotificationMessageOnline.objects.create(
+            **data,
+            channel_id="Push",
+            channel_name="Push",
+            channel_level=4
+        ),
+        "channel": NotificationMessageOffline.objects.create(**data),
+        "group_name": group_name,
+        "alias": alias
+    }
+
+
+def create_words_perfection(is_rest, perfection, date_str):
+    wp = WordsPerfection.objects.create(rest=is_rest, perfection=perfection)
+    if wp is None:
+        return None
+    # 构建推送信息
+    rem_cnt, rev_cnt = wp.remember.count(), wp.review.count()
+    data = {
+        "title": "今日的单词打卡内容已下发，请尽快完成",
+        "body": f"共{rem_cnt}个新单词，{rev_cnt}个复习单词",
+        "big_text": (f"共{rem_cnt}个新单词，{rev_cnt}个复习单词\n"
+                     + ("今天休息，没有新单词，但是该复习的还是得复习哦\n" if is_rest else "")
+                     + f"今天也要记得按时完成打卡任务哦~~"),
+        "click_type": "intent",
+        "payload": _payload(wp)
+    }
+    return _create_remind(data, perfection.user.uuid, date_str + "_new")
+
+
+def create_words_perfections():
+    now = timezone.now()
+    if not (TIME_RANGE[0] <= now.time() <= TIME_RANGE[1]):
+        return
+    is_rest, is_remind = now.weekday() == 6, _is_remind(now)
+    date_str = now.__format__('%Y-%m-%d')
+    reminds = []
+    add_cnt, upd_cnt = 0, 0
+    for perfection in PerfectionStudent.objects.all():
+        # 首先获取最后一次打卡
+        latest = perfection.get_latest(perfection.words)
+        if latest is None or (latest.is_finished and latest.finished.date() != now.date()):
+            res = create_words_perfection(is_rest, perfection, date_str)
+            if res is None:
+                continue
+            reminds.append(res)
+            add_cnt += 1
+        elif not latest.is_finished and latest.updated.date() < now.date():
+            review = list(latest.review.all())
+            review_new = perfection.get_review_words()
+            for word in review_new:
+                if word not in review:
+                    latest.review.add(word)
+            latest.updated = now
+            latest.save()
+            # 构建推送信息
+            rem_cnt, rev_cnt = latest.remember.count(), latest.review.count()
+            data = {
+                "title": "漏打单词内容已更新，请尽快完成",
+                "body": f"共{rem_cnt}个新单词，{rev_cnt}个复习单词\n",
+                "big_text": f"共{rem_cnt}个新单词，{rev_cnt}个复习单词\n"
+                            f"你已经拖欠打卡{(now.date() - latest.created.date()).days}天了\n"
+                            f"当天的任务要当天完成，这么拖合适吗？",
+                "click_type": "intent",
+                "payload": _payload(latest)
+            }
+            reminds.append(_create_remind(data, perfection.user.uuid, date_str + "_upd"))
+            upd_cnt += 1
+        elif is_remind:
+            data = {
+                "title": "今日单词打卡任务未完成",
+                "body": "催打卡啦，催打卡啦，今日的打卡任务还没完成",
+                "big_text": ("催打卡啦，催打卡啦，今日的打卡任务还没完成\n"
+                             + ("今天休息，没有新单词，但是该复习的还是得复习，" if is_rest else "")
+                             + "不要把今天的任务推到明天哦"),
+                "click_type": "intent",
+                "payload": _payload(latest)
+            }
+            reminds.append(_create_remind(data, perfection.user.uuid, date_str + "_rmd"))
+    if len(reminds) == 0:
+        return
+    print(' =' * 10)
+    print(
+        f"{now.__format__('%Y-%m-%d %H:%M:%S')}处理单词打卡内容\n"
+        f"共{add_cnt}个新发布，{upd_cnt}个漏打更新，{len(reminds)}条提醒内容"
+    )
+    for remind_batch in range(0, len(reminds), 200):
+        is_success, msg = to_single_batch_alias(reminds[remind_batch: remind_batch + 200])
+        print(f"发布提醒：{is_success}, {msg}")
+
+
+'''
 def create_words_perfections():
     """
     自动检查，未创建单词打卡的同学自动创建
@@ -164,6 +269,7 @@ def create_words_perfections():
     if add_cnt + miss_cnt + len(reminds) > 0:
         for i in log:
             print(i)
+'''
 
 
 def load_word_list(path):

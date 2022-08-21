@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-21 11:34                                                   =
+#    @Time : 2022-8-21 18:3                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -56,26 +56,19 @@ class Word(models.Model):
 
 class WordsPerfectionManager(models.Manager):
     def create(self, rest=False, *args, **kwargs):
-        user = kwargs.get('user')
-        if user is not None:
-            perfection = user.perfection
-            del kwargs['user']
-        else:
-            perfection = kwargs.get('perfection')
-            if perfection is None:
-                raise ValueError('必须提供 ‘user’ 或 ‘perfection’')
+        perfection = kwargs.get('perfection')
+        if perfection is None:
+            raise ValueError('必须提供‘perfection’')
         # 生成随机单词
-        kwargs['perfection'] = perfection
         total = 20
         if not rest:
-            remembered = perfection.remembered_words.all()
-            reviewing = perfection.reviewing_words.all()
             unremembered = perfection.unremembered_words.all()
-            unremembered_count = unremembered.count()
             # 首先保证保持词库
             remember = list(unremembered)
-            if total > unremembered_count:
+            if total > len(remember):
                 # 补入未记词库的词
+                reviewing = perfection.reviewing_words.all()
+                remembered = perfection.remembered_words.all()
                 excludes = list((remembered | reviewing | unremembered).values_list('word__pk', flat=True))
                 library = QuerySet(model=Word)
                 for lib in perfection.word_libraries.all():
@@ -84,17 +77,16 @@ class WordsPerfectionManager(models.Manager):
                     remember_unpack = library
                 else:
                     remember_unpack = library.exclude(pk__in=excludes)
-                if remember_unpack.count() >= (total - unremembered_count):
-                    remember_unpack = remember_unpack[:total - unremembered_count]
                 # 包装
-                for word in remember_unpack:
+                for word in remember_unpack[:total - len(remember)]:
                     remember.append(WordPerfection.objects.create(word=word))
             review = perfection.get_review_words() + remember
         else:
             remember = []
             review = perfection.get_review_words()
+        if len(remember) == 0 and len(review) == 0:
+            return None
         words_perfection = super(WordsPerfectionManager, self).create(*args, **kwargs)
-        # print(remember, review)
         words_perfection.review.add(*review)
         words_perfection.remember.add(*remember)
         words_perfection.save()

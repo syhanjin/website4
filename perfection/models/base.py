@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-17 15:29                                                   =
+#    @Time : 2022-8-21 18:22                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : base.py                                                           =
@@ -54,6 +54,7 @@ class PerfectionStudent(models.Model):
     def __unicode__(self):
         return self.user.name + '_PERFECTION'
 
+    # 以下内容在多次调用时可以优化，暂时不进行优化
     def get_review_words(self) -> list:
         # 因为不太会搞只能用这种比较贵的方法
         rel = []
@@ -62,41 +63,17 @@ class PerfectionStudent(models.Model):
                 rel.append(word)
         return rel
 
-    # 以下内容在多次调用时可以优化，暂时不进行优化
-    @property
-    def last_words_finished(self):
-        latest = self.words.all().order_by("-finished").first()
-        return getattr(latest, 'finished', None)
-
-    @property
-    def can_add_words_perfection(self):
-        latest = self.get_latest(self.words)
-        if latest is None:
-            return True
-        if not latest.is_finished:
-            return False
-        return latest.created.date() != timezone.now().date()
-
     @property
     def missed_words_perfection(self):
         latest = self.get_latest(self.words)
         if latest is None:
             return False
-        return (not latest.is_finished) and latest.created.date() != timezone.now().date()
-
-    @property
-    def can_update_words_perfection(self):
-        latest = self.get_latest(self.words)
-        if latest is None:
-            return False
-        return (not latest.is_finished) and latest.updated.date() != timezone.now().date()
+        return not latest or ((not latest.is_finished) and latest.created.date() != timezone.now().date())
 
     @property
     def has_unfinished_words_perfection(self):
         latest = self.get_latest(self.words)
-        if latest is None:
-            return False
-        return not latest.is_finished
+        return not latest or (not latest.is_finished)
 
     @staticmethod
     def get_latest(model):
