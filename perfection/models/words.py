@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-18 16:39                                                   =
+#    @Time : 2022-8-21 11:34                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -65,12 +65,12 @@ class WordsPerfectionManager(models.Manager):
             if perfection is None:
                 raise ValueError('必须提供 ‘user’ 或 ‘perfection’')
         # 生成随机单词
+        kwargs['perfection'] = perfection
         total = 20
         if not rest:
             remembered = perfection.remembered_words.all()
             reviewing = perfection.reviewing_words.all()
             unremembered = perfection.unremembered_words.all()
-            kwargs['perfection'] = perfection
             unremembered_count = unremembered.count()
             # 首先保证保持词库
             remember = list(unremembered)
