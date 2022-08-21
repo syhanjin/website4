@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-21 19:11                                                   =
+#    @Time : 2022-8-21 21:52                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -122,7 +122,7 @@ def create_words_perfections():
             }
             reminds.append(_create_remind(data, perfection.user.uuid, date_str + "_upd"))
             upd_cnt += 1
-        elif is_remind:
+        elif is_remind and not latest.is_finished:
             data = {
                 "title": "今日单词打卡任务未完成",
                 "body": "催打卡啦，催打卡啦，今日的打卡任务还没完成",
