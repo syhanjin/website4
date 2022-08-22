@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-22 15:50                                                   =
+#    @Time : 2022-8-22 17:2                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : permissions.py                                                    =
@@ -34,7 +34,11 @@ class _Perfection(BasePermission):
         return True
 
     def has_object_permission(self, request, view, obj):
-        return self.has_permission(request, view)
+        return bool(
+            request.user
+            and request.user.is_authenticated
+            and request.user.perfection
+        )
 
 
 class _Teacher(BasePermission):
@@ -43,7 +47,7 @@ class _Teacher(BasePermission):
         return request.user.perfection.role == 'teacher'
 
     def has_object_permission(self, request, view, obj):
-        return self.has_permission(request, view)
+        return request.user.perfection.role == 'teacher'
 
 
 class _Student(BasePermission):
@@ -52,7 +56,7 @@ class _Student(BasePermission):
         return request.user.perfection.role == 'student'
 
     def has_object_permission(self, request, view, obj):
-        return self.has_permission(request, view)
+        return request.user.perfection.role == 'student'
 
 
 class _Current(BasePermission):
