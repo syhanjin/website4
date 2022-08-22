@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-18 16:1                                                    =
+#    @Time : 2022-8-22 11:40                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : base.py                                                           =
@@ -12,6 +12,7 @@
 
 from rest_framework import serializers
 
+from account.serializers import UserPublicSerializer
 from perfection.conf import settings
 from perfection.models.base import PerfectionStudent
 from perfection.models.words import WordLibrary
@@ -29,7 +30,7 @@ class PerfectionStudentSerializer(serializers.ModelSerializer):
     # unremembered_words = settings.SERIALIZERS.word_perfection(many=True)
     # remembered_words = settings.SERIALIZERS.word_perfection(many=True)
     # reviewing_words = settings.SERIALIZERS.word_perfection(many=True)
-    user = serializers.SerializerMethodField(read_only=True)
+    user = UserPublicSerializer(read_only=True)
     unremembered_words = serializers.SerializerMethodField(read_only=True)
     remembered_words = serializers.SerializerMethodField(read_only=True)
     reviewing_words = serializers.SerializerMethodField(read_only=True)
@@ -38,9 +39,6 @@ class PerfectionStudentSerializer(serializers.ModelSerializer):
 
     has_unfinished_words_perfection = serializers.SerializerMethodField(read_only=True)
     has_missed_words_perfection = serializers.SerializerMethodField(read_only=True)
-
-    def get_user(self, obj):
-        return obj.user.name
 
     def get_unremembered_words(self, obj):
         return obj.unremembered_words.count()

@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-21 18:22                                                   =
+#    @Time : 2022-8-21 21:44                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : base.py                                                           =
@@ -47,7 +47,7 @@ class PerfectionStudent(models.Model):
     objects = PerfectionStudentManager()
 
     SUMMARY_FIELDS = [
-        'user', 'role',
+        'id', 'user', 'role',
         'unremembered_words', 'reviewing_words', 'remembered_words', 'word_libraries'
     ]
 

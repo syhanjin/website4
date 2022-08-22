@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-17 13:56                                                   =
+#    @Time : 2022-8-22 15:50                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : permissions.py                                                    =
@@ -33,14 +33,17 @@ class _Perfection(BasePermission):
             raise NoPerfection
         return True
 
+    def has_object_permission(self, request, view, obj):
+        return self.has_permission(request, view)
+
 
 class _Teacher(BasePermission):
 
     def has_permission(self, request, view):
         return request.user.perfection.role == 'teacher'
 
-    # def has_object_permission(self, request, view, obj):
-    #     return request.user.perfection.id == getattr(obj, 'perfection', obj).id
+    def has_object_permission(self, request, view, obj):
+        return self.has_permission(request, view)
 
 
 class _Student(BasePermission):
@@ -48,15 +51,23 @@ class _Student(BasePermission):
     def has_permission(self, request, view):
         return request.user.perfection.role == 'student'
 
-    # def has_object_permission(self, request, view, obj):
-    #     return request.user.perfection.id == getattr(obj, 'perfection', obj).id
+    def has_object_permission(self, request, view, obj):
+        return self.has_permission(request, view)
+
+
+class _Current(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        # print(request.user.perfection.id != obj.p.id)
+        return request.user.perfection.id != obj.p.id
 
 
 Student = _Perfection & _Student
+CurrentStudent = _Perfection & _Student & _Current
 Teacher = _Perfection & _Teacher
 
 StudentOrTeacher = Student | Teacher
 StudentOrAdmin = Student | AdminSuper
 TeacherOrAdmin = Teacher | AdminSuper
+CurrentStudentOrTeacherOrAdmin = CurrentStudent | Teacher | AdminSuper
 StudentOrTeacherOrAdmin = Student | Teacher | AdminSuper
 # CurrentStudentOrCurrentTeacherOrAdmin = CurrentStudent | CurrentTeacher | AdminSuper

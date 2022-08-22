@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-19 13:58                                                   =
+#    @Time : 2022-8-22 14:47                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : class_.py                                                         =
@@ -10,9 +10,11 @@
 # ==============================================================================
 from rest_framework import serializers
 
+from account.serializers import UserPublicSerializer
 from images.serializers import ImageSerializer
 from perfection.conf import settings
-from perfection.models.class_ import PerfectionClass, PerfectionSubject
+from perfection.models.class_ import PerfectionClass, PerfectionClassStudent, PerfectionSubject
+from perfection.serializers.base import PerfectionStudentSerializer
 
 
 class PerfectionSubjectSerializer(serializers.ModelSerializer):
@@ -77,6 +79,22 @@ class PerfectionClassSubjectGetSerializer(serializers.Serializer):
     id = serializers.UUIDField()
 
 
+class PerfectionClassStudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PerfectionClassStudent
+        exclude = ['id', 'c', 'p']
+
+    perfection = PerfectionStudentSerializer(source="p")
+
+
+class PerfectionClassStudentSetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PerfectionClassStudent
+        exclude = ["id", "c", "p"]
+
+    nickname = serializers.CharField(required=False, allow_blank=True)
+
+
 class PerfectionClassWordsPerfectionDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = settings.MODELS.words_perfection
@@ -85,7 +103,7 @@ class PerfectionClassWordsPerfectionDetailSerializer(serializers.ModelSerializer
 
     picture = ImageSerializer(many=True)
     acc_str = serializers.SerializerMethodField(read_only=True)
-    user = serializers.CharField(source="perfection.user.name")
+    user = UserPublicSerializer(source="perfection.user")
     unremembered = settings.SERIALIZERS.word_perfection_simple(many=True)
     remember = settings.SERIALIZERS.word_perfection_simple(many=True)
     review = settings.SERIALIZERS.word_perfection_simple(many=True)

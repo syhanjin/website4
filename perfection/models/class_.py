@@ -3,12 +3,13 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-21 19:25                                                   =
+#    @Time : 2022-8-22 13:54                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : class_.py                                                         =
 #    @Program: website                                                         =
 # ==============================================================================
+import uuid
 
 import shortuuid
 from django.db import models
@@ -43,6 +44,7 @@ class PerfectionClass(models.Model):
 
 
 class PerfectionClassStudent(models.Model):
-    c = models.ForeignKey(PerfectionClass, on_delete=models.CASCADE)
-    p = models.ForeignKey("perfection.PerfectionStudent", on_delete=models.CASCADE)
-    nickname = models.CharField(max_length=64)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, max_length=64)
+    c = models.ForeignKey(PerfectionClass, on_delete=models.CASCADE, related_name="class_student")
+    p = models.ForeignKey("perfection.PerfectionStudent", on_delete=models.CASCADE, related_name="class_student")
+    nickname = models.CharField(max_length=64, null=True)

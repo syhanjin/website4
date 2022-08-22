@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-17 12:13                                                   =
+#    @Time : 2022-8-21 21:44                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : urls.py                                                           =
@@ -44,6 +44,7 @@ router.register(r'getui/cid', getui.views.CidViewSet)
 
 class_router = routers.NestedSimpleRouter(router, r'perfection/class', lookup='class')
 class_router.register(r'subject', perfection.views.PerfectionClassSubjectViewSet, basename='class-subject')
+class_router.register(r'students', perfection.views.PerfectionClassStudentViewSet, basename='class-student')
 
 urlpatterns = [  # 管理员系统
     # re_path(r'^admin/', admin.site.urls), # 自己搭一个，这个不用了
