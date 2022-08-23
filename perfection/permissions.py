@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-22 17:2                                                    =
+#    @Time : 2022-8-23 11:20                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : permissions.py                                                    =
@@ -62,7 +62,7 @@ class _Student(BasePermission):
 class _Current(BasePermission):
     def has_object_permission(self, request, view, obj):
         # print(request.user.perfection.id != obj.p.id)
-        return request.user.perfection.id != obj.p.id
+        return request.user.perfection.id != obj.perfection.id
 
 
 Student = _Perfection & _Student

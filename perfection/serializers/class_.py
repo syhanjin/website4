@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-22 14:47                                                   =
+#    @Time : 2022-8-23 11:44                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : class_.py                                                         =
@@ -41,15 +41,9 @@ class PerfectionClassSerializer(serializers.ModelSerializer):
         model = PerfectionClass
         fields = '__all__'
 
-    teacher = serializers.SerializerMethodField(read_only=True)
+    teacher = UserPublicSerializer(source='teacher.user')
     subject = PerfectionSubjectSerializer(many=True)
     students = serializers.SerializerMethodField(read_only=True)
-
-    def get_teacher(self, obj):
-        return {
-            "uuid": obj.teacher.user.uuid,
-            "name": obj.teacher.user.name,
-        }
 
     def get_students(self, obj):
         return obj.students.count()
@@ -82,15 +76,21 @@ class PerfectionClassSubjectGetSerializer(serializers.Serializer):
 class PerfectionClassStudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = PerfectionClassStudent
-        exclude = ['id', 'c', 'p']
+        exclude = ['id']
 
-    perfection = PerfectionStudentSerializer(source="p")
+    perfection = PerfectionStudentSerializer()
 
 
-class PerfectionClassStudentSetSerializer(serializers.ModelSerializer):
+class PerfectionClassStudentInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = PerfectionClassStudent
-        exclude = ["id", "c", "p"]
+        exclude = ['id', 'perfection_class', 'perfection']
+
+
+class PerfectionClassStudentUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PerfectionClassStudent
+        exclude = ["id", "perfection_class", "perfection"]
 
     nickname = serializers.CharField(required=False, allow_blank=True)
 

@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-22 13:54                                                   =
+#    @Time : 2022-8-23 11:16                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : class_.py                                                         =
@@ -35,9 +35,9 @@ class PerfectionClass(models.Model):
     created = models.DateTimeField(verbose_name="创建时间", auto_now_add=True, editable=False)
     name = models.CharField(verbose_name="班级名称", max_length=64)
     # students = models.ManyToManyField('perfection.PerfectionStudent', related_name='classes')
-    students = models.ManyToManyField(
-        'perfection.PerfectionStudent', through='PerfectionClassStudent', related_name="classes"
-    )
+    # students = models.ManyToManyField(
+    #     'perfection.PerfectionStudent', through='PerfectionClassStudent', related_name="classes"
+    # )
     teacher = models.ForeignKey('perfection.PerfectionTeacher', related_name='classes', on_delete=models.CASCADE)
     subject = models.ManyToManyField(PerfectionSubject, related_name='classes')
     objects = PerfectionClassManager()
@@ -45,6 +45,8 @@ class PerfectionClass(models.Model):
 
 class PerfectionClassStudent(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, max_length=64)
-    c = models.ForeignKey(PerfectionClass, on_delete=models.CASCADE, related_name="class_student")
-    p = models.ForeignKey("perfection.PerfectionStudent", on_delete=models.CASCADE, related_name="class_student")
+    perfection_class = models.ForeignKey(PerfectionClass, on_delete=models.CASCADE, related_name="students")
+    perfection = models.ForeignKey(
+        "perfection.PerfectionStudent", on_delete=models.CASCADE, related_name="classes"
+    )
     nickname = models.CharField(max_length=64, null=True)

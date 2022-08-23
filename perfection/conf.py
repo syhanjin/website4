@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-22 15:39                                                   =
+#    @Time : 2022-8-23 10:56                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : conf.py                                                           =
@@ -39,7 +39,7 @@ default_settings = {
         {
             "student": ['perfection.permissions.StudentOrTeacherOrAdmin'],
             "student_create": ['account.permissions.CurrentUserOrAdmin'],
-            "student_modify": ['perfection.permissions.CurrentStudentOrTeacherOrAdmin'],
+            "student_update": ['perfection.permissions.CurrentStudentOrTeacherOrAdmin'],
             "teacher": ['perfection.permissions.TeacherOrAdmin'],
             "teacher_create": ['account.permissions.AdminSuper'],
             "class_": ['perfection.permissions.StudentOrTeacherOrAdmin'],

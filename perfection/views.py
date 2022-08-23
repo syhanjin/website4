@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-22 15:1                                                    =
+#    @Time : 2022-8-23 11:43                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -41,7 +41,8 @@ from .models.teacher import PerfectionTeacher
 from .models.words import WordLibrary, WordsPerfection
 from .serializers.class_ import (
     PerfectionClassCreateSerializer, PerfectionClassDetailSerializer, PerfectionClassSerializer,
-    PerfectionClassStudentSerializer, PerfectionClassStudentSetSerializer, PerfectionClassSubjectCheckSerializer,
+    PerfectionClassStudentInfoSerializer, PerfectionClassStudentSerializer, PerfectionClassStudentUpdateSerializer,
+    PerfectionClassSubjectCheckSerializer,
     PerfectionClassSubjectGetSerializer,
     PerfectionSubjectCreateSerializer,
     PerfectionSubjectSerializer,
@@ -268,10 +269,11 @@ class PerfectionClassViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.action == 'add':
-            return super().get_queryset()
+            return super().get_queryset().values_list('perfection_class', flat=True)
         user = self.request.user
-        queryset = user.perfection.classes.all()
-        return queryset
+        if user.perfection.role == 'teacher':
+            return user.perfection.classes.all()
+        return PerfectionClass.objects.filter(students__perfection=user.perfection_student)
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -310,13 +312,13 @@ class PerfectionClassViewSet(viewsets.ModelViewSet):
     def add(self, request, *args, **kwargs):
         user = request.user
         class_ = self.get_object()
-        if class_.students.filter(user=user).count() > 0:
+        if class_.students.filter(perfection=user.perfection_student).count() > 0:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'non_field_errors': ['已在班级内']})
         if user.perfection_student.classes.count() > 0:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'non_field_errors': ['由于某些原因，学生暂时只允许加入一个班级']})
         # class_.students.add(user.perfection_student)
         # class_.save()
-        PerfectionClassStudent.objects.create(c=class_, p=user.perfection)
+        PerfectionClassStudent.objects.create(perfection_class=class_, perfection=user.perfection)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     # @action(methods=['get'], detail=True)
@@ -332,23 +334,23 @@ class PerfectionClassStudentViewSet(viewsets.ModelViewSet):
     serializer_class = PerfectionClassStudentSerializer
     queryset = PerfectionClassStudent.objects.all()
     permission_classes = settings.PERMISSIONS.class_
-    lookup_field = 'p__id'
+    lookup_field = 'perfection__id'
 
     def get_queryset(self):
         # print(self.kwargs)
-        return self.get_class().class_student.all()
+        return self.get_class().students.all()
 
     def get_class(self):
-        return PerfectionClass.objects.filter(pk=self.kwargs['class_id']).first()
+        return PerfectionClass.objects.get(pk=self.kwargs['class_id'])
 
     def get_serializer_class(self):
         if self.action == 'set':
-            return PerfectionClassStudentSetSerializer
+            return PerfectionClassStudentUpdateSerializer
         return super().get_serializer_class()
 
     def get_permissions(self):
         if self.action == 'set':
-            self.permission_classes = settings.PERMISSIONS.student_modify
+            self.permission_classes = settings.PERMISSIONS.student_update
         return super().get_permissions()
 
     @action(methods=['post'], detail=True)
@@ -356,7 +358,6 @@ class PerfectionClassStudentViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(self.get_object(), data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        # _object.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -387,11 +388,11 @@ class PerfectionClassSubjectViewSet(
         return super().get_permissions()
 
     def get_class(self):
-        return PerfectionClass.objects.filter(pk=self.kwargs['class_id']).first()
+        return PerfectionClass.objects.get(pk=self.kwargs['class_id'])
 
     def get_qs(self, subject):
         return getattr(settings.MODELS, f'{subject.id}_perfection').objects.filter(
-            perfection__in=self.get_class().students.all()
+            perfection__in=self.get_class().students.all().values_list('perfection', flat=True)
         )
 
     def get_qs_date(self, subject, date):
@@ -401,9 +402,6 @@ class PerfectionClassSubjectViewSet(
                 datetime.combine(date, time(23, 59, 59, 999))
             ]
         )
-
-    def get_through(self, perfection, class_=None):
-        return PerfectionClassStudent.objects.get(p=perfection, c=(class_ or self.get_class()))
 
     @action(methods=['get'], detail=True)
     def days(self, request, *args, **kwargs):
@@ -450,7 +448,9 @@ class PerfectionClassSubjectViewSet(
         for i in qs:
             serializer = getattr(settings.SERIALIZERS, f'class_{subject.id}_perfection')(i)
             _data = serializer.data
-            _data['nickname'] = self.get_through(i.perfection, class_).nickname
+            _data['class_'] = PerfectionClassStudentInfoSerializer(
+                i.perfection.classes.get(perfection_class=class_)
+            ).data
             data.append(_data)
         return Response(data=data)
 
@@ -485,12 +485,14 @@ class PerfectionClassSubjectViewSet(
         serializer.is_valid(raise_exception=True)
         subject = self.get_object()
         data = serializer.validated_data
-        _object = self.get_qs(subject).filter(id=data['id']).first()
+        _object = self.get_qs(subject).get(id=data['id'])
         _serializer = getattr(settings.SERIALIZERS, f'class_{subject.id}_perfection_detail')(
             _object, context=self.get_serializer_context()
         )
         data = _serializer.data
-        data['nickname'] = self.get_through(_object.perfection).nickname
+        data['class_'] = PerfectionClassStudentInfoSerializer(
+            _object.perfection.classes.get(perfection_class=self.get_class())
+        ).data
         return Response(data=data)
 
 
