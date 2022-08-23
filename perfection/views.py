@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-23 13:56                                                   =
+#    @Time : 2022-8-23 15:13                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -95,7 +95,7 @@ class PDF_TEMPLATES:
         BODY_HEADER_STYLE = TITLE_STYLE
 
         LINE = '<para>' \
-               '<font face="Consolas" size=12>{index}. {word} ____________________</font>' \
+               '<font face="Consolas" size=12>{index}. {word} _______________</font>' \
                '<br/></para>'
         LINE_STYLE = REVIEW_LINE_STYLE
 
