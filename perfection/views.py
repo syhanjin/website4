@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-23 11:43                                                   =
+#    @Time : 2022-8-23 13:56                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -656,13 +656,14 @@ class WordsPerfectionViewSet(viewsets.ModelViewSet):
         _object.finished = timezone.now()
         _object.save()
         # 向老师发送提醒
-        for class_ in _object.perfection.classes.filter(subject__id="words"):
+        for class_ in _object.perfection.classes.filter(perfection_class__subject__id="words"):
             date_str = _object.created.__format__('%Y-%m-%d')
+            name = class_.nickname or _object.perfection.user.name
             data = {
-                "title": f"{_object.perfection.user.name}已提交打卡，请及时批改",
-                "body": f"班级：{class_.name}({class_.id})学员[{_object.perfection.user.name}]已提交"
+                "title": f"{name}已提交打卡，请及时批改",
+                "body": f"班级：{class_.perfection_class.name}({class_.perfection_class.id})学员[{name}]已提交"
                         f"{date_str}日单词打卡，请及时批改",
-                "big_text": f"班级：{class_.name}({class_.id})学员[{_object.perfection.user.name}]已提交"
+                "big_text": f"班级：{class_.perfection_class.name}({class_.perfection_class.id})学员[{name}]已提交"
                             f"{_object.created.__format__('%Y-%m-%d')}日单词打卡，请及时批改",
                 "click_type": "intent",
                 "payload": json.dumps(
@@ -687,7 +688,7 @@ class WordsPerfectionViewSet(viewsets.ModelViewSet):
                 ),
                 channel=NotificationMessageOffline.objects.create(**data),
                 group_name=date_str + '_teacher',
-                alias=class_.teacher.user.uuid
+                alias=class_.perfection_class.teacher.user.uuid
             )
         picture = []
         for pic in _object.picture.all():
