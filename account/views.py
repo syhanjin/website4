@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-9 11:27                                                    =
+#    @Time : 2022-8-25 14:41                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -12,6 +12,7 @@
 
 from django.contrib.auth import get_user_model
 from djoser import utils
+from djoser.compat import get_user_email
 from djoser.conf import settings
 from djoser.views import UserViewSet as BaseUserViewSet
 from rest_framework import status, views, viewsets
@@ -72,6 +73,23 @@ class UserViewSet(BaseUserViewSet):
         user.signature = new_signature
         user.save()
         return Response(data={'signature': user.signature}, status=status.HTTP_200_OK)
+
+    @action(["post"], detail=False)
+    def reset_password_confirm(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        serializer.user.set_password(serializer.data["new_password"])
+        serializer.user.save()
+
+        if settings.TOKEN_MODEL:
+            settings.TOKEN_MODEL.objects.filter(user=serializer.user).delete()
+
+        if settings.PASSWORD_CHANGED_EMAIL_CONFIRMATION:
+            context = {"user": serializer.user}
+            to = [get_user_email(serializer.user)]
+            settings.EMAIL.password_changed_confirmation(self.request, context).send(to)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TokenDestroyView(views.APIView):
