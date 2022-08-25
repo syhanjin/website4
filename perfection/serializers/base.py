@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-22 11:40                                                   =
+#    @Time : 2022-8-24 18:57                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : base.py                                                           =
@@ -51,9 +51,7 @@ class PerfectionStudentSerializer(serializers.ModelSerializer):
 
     def get_has_unfinished_words_perfection(self, obj):
         latest = obj.get_latest(obj.words)
-        if not latest:
-            return False
-        return not latest.is_finished
+        return not latest or not latest.is_finished
 
     def get_has_missed_words_perfection(self, obj):
         return obj.missed_words_perfection

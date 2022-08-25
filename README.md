@@ -16,3 +16,8 @@
 当然已有的数据恐怕有亿点点难以处理，所以，，抱歉抱歉抱歉
 
 实在是能力有限
+
+## 注意
+
+由于需要适配`djongo-mongodb`，修改了`django/db/backends/base/operations.py`
+![](changed-django.png)

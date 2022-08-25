@@ -14,7 +14,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-16 17:31                                                   =
+#    @Time : 2022-8-25 13:24                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : prod.py                                                           =
@@ -170,6 +170,7 @@ DJOSER = {
     'SITE_NAME': 'Sakuyark',
     'SEND_ACTIVATION_EMAIL': True,
     'ACTIVATION_URL': 'activation/{uid}/{token}',
+    'PASSWORD_RESET_CONFIRM_URL': 'reset_password/{uid}/{token}',
     "SERIALIZERS": {
         "current_user": "account.serializers.UserSerializer",
     },
