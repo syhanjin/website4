@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-23 15:13                                                   =
+#    @Time : 2022-9-4 13:13                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -52,7 +52,8 @@ from .serializers.teacher import (
     PerfectionTeacherSerializer,
 )
 from .serializers.words import (
-    WordLibrarySerializer, WordsPerfectionFinishSerializer, WordsPerfectionRememberAndReviewSerializer,
+    WordLibrarySerializer, WordsPerfectionFinishSerializer, WordsPerfectionListSerializer,
+    WordsPerfectionRememberAndReviewSerializer,
     WordsPerfectionRememberSerializer,
     WordsPerfectionReviewSerializer,
     WordsPerfectionSerializer, WordsPerfectionUnrememberedSerializer,
@@ -536,7 +537,9 @@ class WordsPerfectionViewSet(viewsets.ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
-        if self.action == 'remember' or self.action == 'remember_file':
+        if self.action == 'list':
+            return WordsPerfectionListSerializer
+        elif self.action == 'remember' or self.action == 'remember_file':
             return WordsPerfectionRememberSerializer
         elif self.action == 'review' or self.action == 'review_file':
             return WordsPerfectionReviewSerializer

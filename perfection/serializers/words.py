@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-19 13:57                                                   =
+#    @Time : 2022-9-4 13:12                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -39,6 +39,17 @@ class WordsPerfectionSerializer(serializers.ModelSerializer):
     #     for img in obj.picture.all():
     #         images.append(img.image.url)
     #     return images
+
+
+class WordsPerfectionListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WordsPerfection
+        fields = ['id', 'created', 'is_finished', 'is_checked', 'rating', 'acc']
+
+    acc = serializers.SerializerMethodField(read_only=True)
+
+    def get_acc(self, obj):
+        return obj.accuracy
 
 
 class WordPerfectionSerializer(serializers.ModelSerializer):
