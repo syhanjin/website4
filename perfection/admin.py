@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-21 21:52                                                   =
+#    @Time : 2022-9-21 22:35                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -28,11 +28,12 @@ TIME_RANGE = (
 )
 
 REMIND_TIMES = [
-    time(hour=18, minute=00),
-    time(hour=20, minute=00),
-    time(hour=21, minute=30),
+    # 由于华为推送限制，暂时关闭大部分推送 2022-09-21
+    # time(hour=18, minute=00),
+    # time(hour=20, minute=00),
+    # time(hour=21, minute=30),
     time(hour=22, minute=00),
-    time(hour=22, minute=30)
+    # time(hour=22, minute=30)
 ]
 
 
