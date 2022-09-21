@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-9-4 13:13                                                    =
+#    @Time : 2022-9-21 22:2                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -270,7 +270,7 @@ class PerfectionClassViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.action == 'add':
-            return super().get_queryset().values_list('perfection_class', flat=True)
+            return super().get_queryset()  # .values_list('perfection_class', flat=True)
         user = self.request.user
         if user.perfection.role == 'teacher':
             return user.perfection.classes.all()
