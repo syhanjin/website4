@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-11-20 10:50                                                  =
+#    @Time : 2022-11-20 11:6                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -326,7 +326,7 @@ def load_word_list(path):
                     word.chinese = _chinese
                 # else:
                 # print("输入不符合，默认保留原词义")
-                word.save()
+            word.save()
         # Word.objects.update_or_create(
         #     defaults={
         #         "word": row['单词'].replace(' ', ""),
