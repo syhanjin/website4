@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-11-20 9:38                                                   =
+#    @Time : 2022-11-20 10:50                                                  =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -304,7 +304,7 @@ def load_word_list(path):
         raise ValueError('单词列表文件需包含 “单词” “词义” “音标”三列')
     for idx, row in word_list.iterrows():
         _word = row['单词'].replace(' ', "")
-        _chinese = row['词义']
+        _chinese = row['词义'].strip()
         _symbol = row['音标'].replace(' ', "")
         word = Word.objects.filter(word=_word)
         if not word.exists():
@@ -316,7 +316,7 @@ def load_word_list(path):
             if not word.libraries.filter(pk=library.pk).exists():
                 word.libraries.add(library)
             if word.chinese != _chinese:
-                op = input(f"{_word}: (1 {_chinese} <==> (2 {word.chinese} ==> (3 手动输入 :")
+                op = input(f"{_word}: (1 {_chinese} <==> (2[Default] {word.chinese} ==> (3 手动输入 :")
                 if op == "1":
                     word.chinese = _chinese
                 elif op == "2":
@@ -324,8 +324,8 @@ def load_word_list(path):
                 elif op == "3":
                     _chinese = input(f"输入词义({_word}): ")
                     word.chinese = _chinese
-                else:
-                    print("输入不符合，默认保留原词义")
+                # else:
+                # print("输入不符合，默认保留原词义")
                 word.save()
         # Word.objects.update_or_create(
         #     defaults={
