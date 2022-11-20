@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-10-2 12:54                                                   =
+#    @Time : 2022-11-20 13:37                                                  =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -516,7 +516,7 @@ class PerfectionSubjectViewSet(viewsets.ModelViewSet):
 
 class WordsPagination(PageNumberPagination):
     # 默认的大小
-    page_size = 10
+    page_size = 20
     page_size_query_param = 'page_size'
     max_page_size = 30
 
