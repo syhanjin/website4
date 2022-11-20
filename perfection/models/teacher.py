@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-16 17:23                                                   =
+#    @Time : 2022-11-20 9:19                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : teacher.py                                                        =
@@ -16,8 +16,8 @@ from django.db import models
 User = get_user_model()
 
 
-class PerfectionTeacherManager(models.Manager):
-    pass
+# class PerfectionTeacherManager(models.Manager):
+#     pass
 
 
 class PerfectionTeacher(models.Model):
@@ -25,7 +25,7 @@ class PerfectionTeacher(models.Model):
     user = models.OneToOneField(to=User, related_name="perfection_teacher", on_delete=models.CASCADE)
 
     role = 'teacher'
-    objects = PerfectionTeacherManager()
+    # objects = PerfectionTeacherManager()
     SUMMARY_FIELDS = [
         'user', 'role',
     ]

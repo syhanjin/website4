@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-9-4 13:12                                                    =
+#    @Time : 2022-11-20 8:3                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -66,12 +66,12 @@ class WordPerfectionSerializer(serializers.ModelSerializer):
 class WordPerfectionSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = WordPerfection
-        fields = ['word', 'symbol', 'chinese', 'library']
+        fields = ['word', 'symbol', 'chinese', 'libraries']
 
     word = serializers.CharField(source='word.word')
     symbol = serializers.CharField(source='word.symbol')
     chinese = serializers.CharField(source='word.chinese')
-    library = serializers.CharField(source='word.library.name')
+    # library = serializers.CharField(source='word.library.name')
 
 
 class WordsPerfectionRememberSerializer(serializers.ModelSerializer):
@@ -113,8 +113,6 @@ class WordLibrarySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'is_default', 'total']
 
     total = serializers.SerializerMethodField(read_only=True)
-
-    # surplus =
 
     def get_total(self, obj):
         return obj.words.count()

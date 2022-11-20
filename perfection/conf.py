@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-23 10:56                                                   =
+#    @Time : 2022-11-20 9:6                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : conf.py                                                           =
@@ -69,7 +69,8 @@ default_settings = {
     ),
     "MODELS": ObjDict(
         {
-            "words_perfection": "perfection.models.words.WordsPerfection"
+            "words_perfection": "perfection.models.words.WordsPerfection",
+            "perfection_teacher": "perfection.models.teacher.PerfectionTeacher"
         }
     ),
     "CHOICES": ObjDict(

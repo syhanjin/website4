@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-21 18:3                                                    =
+#    @Time : 2022-11-20 8:13                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -46,8 +46,8 @@ class Word(models.Model):
     word = models.CharField(max_length=40, verbose_name='英文')
     symbol = models.CharField(max_length=40, verbose_name='音标', null=True)
     chinese = models.CharField(max_length=1000, verbose_name='中文释义')
-    library = models.ForeignKey(
-        WordLibrary, max_length=128, verbose_name='所属词库', related_name='words', on_delete=models.CASCADE
+    libraries = models.ManyToManyField(
+        WordLibrary, max_length=128, verbose_name='所属词库', related_name='words'
     )
 
     random = models.CharField(max_length=24, primary_key=True, editable=False, unique=True, default=unique_random_str)
@@ -149,6 +149,8 @@ class WordsPerfection(models.Model):
     # total = models.PositiveIntegerField(verbose_name="总数", default=0)
     # picture = models.ImageField(verbose_name="打卡内容图片", null=True, upload_to="perfection/words")
     picture = models.ManyToManyField('images.Image', verbose_name="打卡内容图片", related_name="words")
+
+    # accepted = models.FloatField(default=0)
 
     created = models.DateTimeField(verbose_name="生成打卡任务时间", auto_now_add=True, editable=False)
     updated = models.DateTimeField(verbose_name="打卡任务更新时间", auto_now_add=True, editable=True)
