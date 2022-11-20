@@ -3,13 +3,12 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-11-20 13:40                                                  =
+#    @Time : 2022-11-20 13:45                                                  =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
 #    @Program: website                                                         =
 # ==============================================================================
-from django.forms import model_to_dict
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
@@ -60,7 +59,11 @@ class WordPerfectionSerializer(serializers.ModelSerializer):
     word = serializers.SerializerMethodField(read_only=True)
 
     def get_word(self, obj):
-        return model_to_dict(obj.word)
+        return {
+            'word': obj.word.word,
+            'chinese': obj.word.chinese,
+            'symbol': obj.word.symbol
+        }
 
 
 class WordPerfectionSimpleSerializer(serializers.ModelSerializer):
