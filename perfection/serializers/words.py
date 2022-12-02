@@ -3,11 +3,11 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-11-20 13:45                                                  =
+#    @Time : 2022-12-2 20:38                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
-#    @Program: website                                                         =
+#    @Program: backend                                                         =
 # ==============================================================================
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
@@ -43,7 +43,7 @@ class WordsPerfectionSerializer(serializers.ModelSerializer):
 class WordsPerfectionListSerializer(serializers.ModelSerializer):
     class Meta:
         model = WordsPerfection
-        fields = ['id', 'created', 'is_finished', 'is_checked', 'rating', 'acc']
+        fields = ['id', 'updated', 'is_finished', 'is_checked', 'rating', 'acc']
 
     acc = serializers.SerializerMethodField(read_only=True)
 
@@ -80,7 +80,7 @@ class WordPerfectionSimpleSerializer(serializers.ModelSerializer):
 class WordsPerfectionRememberSerializer(serializers.ModelSerializer):
     class Meta:
         model = WordsPerfection
-        fields = ['created', 'remember']
+        fields = ['updated', 'remember']
 
     remember = WordPerfectionSerializer(many=True)
 
@@ -88,7 +88,7 @@ class WordsPerfectionRememberSerializer(serializers.ModelSerializer):
 class WordsPerfectionUnrememberedSerializer(serializers.ModelSerializer):
     class Meta:
         model = WordsPerfection
-        fields = ['created', 'unremembered']
+        fields = ['updated', 'unremembered']
 
     unremembered = WordPerfectionSerializer(many=True)
 
@@ -96,7 +96,7 @@ class WordsPerfectionUnrememberedSerializer(serializers.ModelSerializer):
 class WordsPerfectionReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = WordsPerfection
-        fields = ['created', 'review']
+        fields = ['updated', 'review']
 
     review = WordPerfectionSerializer(many=True)
 
@@ -104,7 +104,7 @@ class WordsPerfectionReviewSerializer(serializers.ModelSerializer):
 class WordsPerfectionRememberAndReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = WordsPerfection
-        fields = ['created', 'remember', 'review']
+        fields = ['updated', 'remember', 'review']
 
     remember = WordPerfectionSerializer(many=True)
     review = WordPerfectionSerializer(many=True)

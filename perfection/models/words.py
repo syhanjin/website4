@@ -2,11 +2,11 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-11-20 8:13                                                   =
+#    @Time : 2022-12-2 20:39                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
-#    @Program: website                                                         =
+#    @Program: backend                                                         =
 # ==============================================================================
 import uuid
 from datetime import timedelta
@@ -89,6 +89,7 @@ class WordsPerfectionManager(models.Manager):
         words_perfection = super(WordsPerfectionManager, self).create(*args, **kwargs)
         words_perfection.review.add(*review)
         words_perfection.remember.add(*remember)
+
         words_perfection.save()
         return words_perfection
 
@@ -127,7 +128,7 @@ class WordPerfection(models.Model):
 
 class WordsPerfection(models.Model):
     class Meta:
-        ordering = ['-created']
+        ordering = ['-updated']
         verbose_name = "单词打卡"
         verbose_name_plural = verbose_name
 
@@ -171,7 +172,7 @@ class WordsPerfection(models.Model):
     objects = WordsPerfectionManager()
     REQUIRED_FIELDS = ['perfection', ]
     SUMMARY_FIELDS = [
-        'id', 'perfection', 'created',
+        'id', 'perfection', 'updated',
         'picture', 'rating',
         'is_finished', 'finished',
         'is_checked', 'checked'

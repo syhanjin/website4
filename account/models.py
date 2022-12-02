@@ -1,11 +1,11 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-16 15:44                                                   =
+#    @Time : 2022-12-2 21:27                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : models.py                                                         =
-#    @Program: website                                                         =
+#    @Program: backend                                                         =
 # ==============================================================================
 import shortuuid
 from django.conf import settings

@@ -3,11 +3,11 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-7-31 15:59                                                   =
+#    @Time : 2022-12-2 21:26                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : serializers.py                                                    =
-#    @Program: website                                                         =
+#    @Program: backend                                                         =
 # ==============================================================================
 
 from rest_framework import serializers

@@ -2,11 +2,11 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-11-20 9:7                                                    =
+#    @Time : 2022-12-2 20:38                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : base.py                                                           =
-#    @Program: website                                                         =
+#    @Program: backend                                                         =
 # ==============================================================================
 import uuid
 
@@ -77,7 +77,7 @@ class PerfectionStudent(models.Model):
 
     @staticmethod
     def get_latest(model):
-        return model.all().order_by("-created").first()
+        return model.all().order_by("-updated").first()
 
 
 class RatingChoice(models.TextChoices):

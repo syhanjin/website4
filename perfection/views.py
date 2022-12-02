@@ -1,11 +1,11 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-11-20 13:37                                                  =
+#    @Time : 2022-12-2 20:38                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
-#    @Program: website                                                         =
+#    @Program: backend                                                         =
 # ==============================================================================
 import io
 import json
@@ -151,9 +151,9 @@ def to_pdf(words, date, mode="review"):
     return file
 
 
-def to_pdf_resp(words, created, mode):
+def to_pdf_resp(words, updated, mode):
     mode2text = {'review': '打卡版', 'remember': '记忆版'}
-    date = created.__format__("%Y-%m-%d")
+    date = updated.__format__("%Y-%m-%d")
     pdf = to_pdf(words=words, date=date, mode=mode)
     pdf.seek(0)
     resp = FileResponse(pdf, as_attachment=True, filename=f"""{date}【{mode2text[mode]}】.pdf""")
@@ -601,14 +601,14 @@ class WordsPerfectionViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=True)
     def remember_file(self, request, *args, **kwargs):
         instance = self.get_object()
-        return to_pdf_resp(instance.remember.all(), instance.created, mode='remember')
+        return to_pdf_resp(instance.remember.all(), instance.updated, mode='remember')
 
     @action(methods=['get'], detail=True)
     def review_file(self, request, *args, **kwargs):
         instance = self.get_object()
         words = list(instance.review.all())
         random.shuffle(words)
-        return to_pdf_resp(words, instance.created, mode='review')
+        return to_pdf_resp(words, instance.updated, mode='review')
 
     @action(methods=['get'], detail=True)
     def remember_review(self, request, *args, **kwargs):
