@@ -2,11 +2,11 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-12-2 20:39                                                   =
+#    @Time : 2022-12-7 21:22                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
-#    @Program: backend                                                         =
+#    @Program: website                                                         =
 # ==============================================================================
 import uuid
 from datetime import timedelta
@@ -73,6 +73,7 @@ class WordsPerfectionManager(models.Manager):
                 library = QuerySet(model=Word)
                 for lib in perfection.word_libraries.all():
                     library = library | lib.words.all()
+                library = library.distinct()
                 if len(excludes) == 0:
                     remember_unpack = library
                 else:
