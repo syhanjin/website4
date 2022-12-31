@@ -1,11 +1,11 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-12-2 20:38                                                   =
+#    @Time : 2022-12-31 20:49                                                  =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
-#    @Program: backend                                                         =
+#    @Program: website                                                         =
 # ==============================================================================
 import io
 import json
@@ -105,29 +105,14 @@ class PDF_TEMPLATES:
 
 
 def to_pdf(words, date, mode="review"):
-    template = getattr(PDF_TEMPLATES, mode.upper(), None)
-    if template is None:
-        raise ValueError(f"mode={mode}, template={template}")
-    story = [
-        Paragraph(template.BODY_HEADER.format(date=date), template.BODY_HEADER_STYLE)
-    ]
-    body = []
-    for index, word in enumerate(words):
-        body.append(
-            Paragraph(
-                template.LINE.format(
-                    index=index + 1,
-                    word=word.word.word,
-                    symbol=word.word.symbol,
-                    chinese=word.word.chinese
-                ), template.LINE_STYLE
-            )
-        )
-    if mode.lower() == 'review':
-        story.append(BalancedColumns(body, nCols=2))
-        story.append(PageBreak())
+    def build_remember():
+        story = [
+            Paragraph(PDF_TEMPLATES.REMEMBER.BODY_HEADER.format(date=date), PDF_TEMPLATES.REMEMBER.BODY_HEADER_STYLE)
+        ]
+        body_remember = []
+        body_test = []
         for index, word in enumerate(words):
-            story.append(
+            body_remember.append(
                 Paragraph(
                     PDF_TEMPLATES.REMEMBER.LINE.format(
                         index=index + 1,
@@ -137,10 +122,61 @@ def to_pdf(words, date, mode="review"):
                     ), PDF_TEMPLATES.REMEMBER.LINE_STYLE
                 )
             )
+            body_test.append(
+                Paragraph(
+                    PDF_TEMPLATES.REVIEW.LINE.format(
+                        index=index + 1,
+                        word=word.word.word,
+                        symbol=word.word.symbol,
+                        chinese=word.word.chinese
+                    ), PDF_TEMPLATES.REVIEW.LINE_STYLE
+                )
+            )
+        story += body_remember
+        story.append(BalancedColumns(body_test, nCols=2))
+        story.append(Paragraph(PDF_TEMPLATES.REMEMBER.BODY_FOOTER, PDF_TEMPLATES.REMEMBER.BODY_FOOTER_STYLE))
+        return story
 
+    def build_review():
+        story = [
+            Paragraph(PDF_TEMPLATES.REVIEW.BODY_HEADER.format(date=date), PDF_TEMPLATES.REVIEW.BODY_HEADER_STYLE)
+        ]
+        body_test = []
+        body_answer = []
+        for index, word in enumerate(words):
+            body_test.append(
+                Paragraph(
+                    PDF_TEMPLATES.REVIEW.LINE.format(
+                        index=index + 1,
+                        word=word.word.word,
+                        symbol=word.word.symbol,
+                        chinese=word.word.chinese
+                    ), PDF_TEMPLATES.REVIEW.LINE_STYLE
+                )
+            )
+            body_answer.append(
+                Paragraph(
+                    PDF_TEMPLATES.REMEMBER.LINE.format(
+                        index=index + 1,
+                        word=word.word.word,
+                        symbol=word.word.symbol,
+                        chinese=word.word.chinese
+                    ), PDF_TEMPLATES.REMEMBER.LINE_STYLE
+                )
+            )
+        story.append(BalancedColumns(body_test, nCols=2))
+        story.append(PageBreak())
+        story += body_answer
+        story.append(Paragraph(PDF_TEMPLATES.REVIEW.BODY_FOOTER, PDF_TEMPLATES.REVIEW.BODY_FOOTER_STYLE))
+        return story
+
+    mode = mode.upper()
+    if mode == 'REMEMBER':
+        story = build_remember()
+    elif mode == 'REVIEW':
+        story = build_review()
     else:
-        story += body
-    story.append(Paragraph(template.BODY_FOOTER, template.BODY_FOOTER_STYLE))
+        raise ValueError(f'mode={mode} is not allowed.')
     file = io.BytesIO()
     doc = SimpleDocTemplate(
         file,
