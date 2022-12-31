@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-12-31 20:49                                                  =
+#    @Time : 2022-12-31 20:51                                                  =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -134,6 +134,7 @@ def to_pdf(words, date, mode="review"):
             )
         story += body_remember
         story.append(BalancedColumns(body_test, nCols=2))
+        story += [Paragraph("")] * 3
         story.append(Paragraph(PDF_TEMPLATES.REMEMBER.BODY_FOOTER, PDF_TEMPLATES.REMEMBER.BODY_FOOTER_STYLE))
         return story
 
