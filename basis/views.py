@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-1-29 18:41                                                   =
+#    @Time : 2023-1-29 23:33                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -166,6 +166,6 @@ class AppViewSet(viewsets.ModelViewSet):
             for version in app.versions.filter(version_code__gt=VersionCode):
                 if version.is_force:
                     data["is_force"] = True
-                data["updates"] += f"# {version.version_name}\n{version.updates}"
+                data["updates"] += f"# {version.version_name}\n{version.updates}\n"
 
         return Response(status=status.HTTP_200_OK, data=data)
