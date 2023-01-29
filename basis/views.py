@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-1-29 15:59                                                   =
+#    @Time : 2023-1-29 18:41                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -141,7 +141,7 @@ class AppViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        app = App.objects.filter(id=data['app_id'])[0]
+        app = App.objects.get(id=data['app_id'])
         apk = data['apk']
         apk.name = f"{app.name}-{data['version_name']}.apk"
         version = AppVersion.objects.create(

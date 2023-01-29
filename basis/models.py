@@ -1,11 +1,11 @@
 # ==============================================================================
-#  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
+#  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-12-2 21:27                                                   =
+#    @Time : 2023-1-29 18:41                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : models.py                                                         =
-#    @Program: backend                                                         =
+#    @Program: website                                                         =
 # ==============================================================================
 import uuid
 
@@ -83,8 +83,8 @@ class AppVersion(models.Model):
     id = models.UUIDField(verbose_name="编号", primary_key=True, default=uuid.uuid4, editable=False, max_length=64)
     app = models.ForeignKey(to=App, related_name='versions', on_delete=models.CASCADE)
 
-    version_name = models.CharField(max_length=64, verbose_name="版本名称", unique=True)
-    version_code = models.PositiveIntegerField(verbose_name="版本号", unique=True)
+    version_name = models.CharField(max_length=64, verbose_name="版本名称")
+    version_code = models.PositiveIntegerField(verbose_name="版本号")
     updates = models.CharField(max_length=5000, verbose_name="更新内容")
     author = models.ForeignKey(User, verbose_name='发布者', null=True, on_delete=models.SET_NULL)
     released = models.DateTimeField(verbose_name="发布时间", auto_now_add=True, editable=False)

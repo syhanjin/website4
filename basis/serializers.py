@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 
 # ==============================================================================
-#  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
+#  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-12-2 21:27                                                   =
+#    @Time : 2023-1-29 18:55                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : serializers.py                                                    =
-#    @Program: backend                                                         =
+#    @Program: website                                                         =
 # ==============================================================================
+from django.db.models import Q
 from rest_framework import serializers
 
 from .models import App, AppVersion, Notice, NoticeTypeChoice
@@ -97,11 +98,23 @@ class AppVersionCreateSerializer(serializers.ModelSerializer):
     is_force = serializers.ChoiceField(choices=['true', 'false'])
     apk = serializers.FileField()
 
-    def validate_app_id(self, attr):
-        if App.objects.filter(id=attr).count() > 0:
-            return attr
-        else:
+    def validate(self, attrs):
+        if not App.objects.filter(id=attrs["id"]).exists():
             raise serializers.ValidationError("app不存在")
+        app = App.objects.get(id=attrs["id"])
+        if app.versions.filter(Q(version_name=attrs['version_name']) | Q(version_code=attrs["version_code"])).exists():
+            raise serializers.ValidationError("版本号或版本名已存在")
+        return attrs
+    # def validate_app_id(self, attr):
+    #     if App.objects.filter(id=attr).exists():
+    #         return attr
+    #     else:
+    #         raise serializers.ValidationError("app不存在")
+    # def validate_version_name(self, attr):
+    #     if App.objects.get(id)
+    #         return attr
+    #     else:
+    #         raise serializers.ValidationError("app不存在")
 
 
 class AppSerializer(serializers.ModelSerializer):
