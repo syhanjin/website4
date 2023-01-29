@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-1-29 18:55                                                   =
+#    @Time : 2023-1-29 18:59                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : serializers.py                                                    =
@@ -99,9 +99,9 @@ class AppVersionCreateSerializer(serializers.ModelSerializer):
     apk = serializers.FileField()
 
     def validate(self, attrs):
-        if not App.objects.filter(id=attrs["id"]).exists():
+        if not App.objects.filter(id=attrs["app_id"]).exists():
             raise serializers.ValidationError("app不存在")
-        app = App.objects.get(id=attrs["id"])
+        app = App.objects.get(id=attrs["app_id"])
         if app.versions.filter(Q(version_name=attrs['version_name']) | Q(version_code=attrs["version_code"])).exists():
             raise serializers.ValidationError("版本号或版本名已存在")
         return attrs
