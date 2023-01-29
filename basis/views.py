@@ -1,7 +1,7 @@
 # ==============================================================================
-#  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
+#  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-15 16:23                                                   =
+#    @Time : 2023-1-29 15:51                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -162,5 +162,10 @@ class AppViewSet(viewsets.ModelViewSet):
         data = latest.data
         VersionCode = request.query_params.get('VersionCode')
         if VersionCode:
-            data['is_force'] = (app.versions.filter(version_code__gt=VersionCode, is_force__in=[True]).count() > 0)
+            data["updates"] = f"# {data['version_name']}\n{data['updates']}"
+            for version in app.versions.filter(version_code__gt=VersionCode):
+                if version.is_force:
+                    data["is_force"] = True
+                data["updates"] += f"# {version.version_name}\n{version.updates}"
+
         return Response(status=status.HTTP_200_OK, data=data)
