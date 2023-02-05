@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-5 13:27                                                    =
+#    @Time : 2023-2-5 15:17                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : chWords.py                                                        =
@@ -69,7 +69,7 @@ class ChWordPerfectionSerializer(serializers.ModelSerializer):
 class ChWordPerfectionSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChWordPerfection
-        fields = ['key', 'value']
+        fields = ['key', 'sentence', 'value']
 
     key = serializers.CharField(source='chWord.key')
     sentence = serializers.CharField(source='chWord.sentence')
