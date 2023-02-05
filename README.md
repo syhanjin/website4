@@ -21,3 +21,5 @@
 
 由于需要适配`djongo-mongodb`，修改了`django/db/backends/base/operations.py`
 ![](changed-django.png)
+
+由于时间不足，成语打卡由单词打卡复制而来，有机会再整合，修改需要修改双份

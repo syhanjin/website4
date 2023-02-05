@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 # ==============================================================================
-#  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
+#  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-11-20 9:6                                                    =
+#    @Time : 2023-2-5 13:34                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : conf.py                                                           =
@@ -40,42 +40,55 @@ default_settings = {
             "student": ['perfection.permissions.StudentOrTeacherOrAdmin'],
             "student_create": ['account.permissions.CurrentUserOrAdmin'],
             "student_update": ['perfection.permissions.CurrentStudentOrTeacherOrAdmin'],
-            "teacher": ['perfection.permissions.TeacherOrAdmin'],
-            "teacher_create": ['account.permissions.AdminSuper'],
-            "class_": ['perfection.permissions.StudentOrTeacherOrAdmin'],
-            "class_add": ['perfection.permissions.Student'],
-            "class_create": ['perfection.permissions.Teacher'],
-            "class_subject": ['perfection.permissions.StudentOrTeacherOrAdmin'],
-            "class_subject_manage": ['perfection.permissions.Teacher'],
-            "subject": ['rest_framework.permissions.AllowAny'],
-            "subject_create": ['account.permissions.AdminSuper'],
             "words_library_set": ['perfection.permissions.StudentOrTeacherOrAdmin'],
             "word_libraries": ["rest_framework.permissions.AllowAny"],
             "words": ['perfection.permissions.StudentOrTeacherOrAdmin'],
             "words_create": ['perfection.permissions.TeacherOrAdmin'],
-            "words_finish": ['perfection.permissions.Student']
+            "words_finish": ['perfection.permissions.Student'],
+            "chIdioms_library_set": ['perfection.permissions.StudentOrTeacherOrAdmin'],
+            "chIdiom_libraries": ["rest_framework.permissions.AllowAny"],
+            "chIdioms": ['perfection.permissions.StudentOrTeacherOrAdmin'],
+            "chIdioms_create": ['perfection.permissions.TeacherOrAdmin'],
+            "chIdioms_finish": ['perfection.permissions.Student'],
+            "chWords_library_set": ['perfection.permissions.StudentOrTeacherOrAdmin'],
+            "chWord_libraries": ["rest_framework.permissions.AllowAny"],
+            "chWords": ['perfection.permissions.StudentOrTeacherOrAdmin'],
+            "chWords_create": ['perfection.permissions.TeacherOrAdmin'],
+            "chWords_finish": ['perfection.permissions.Student'],
         }
     ),
     "SERIALIZERS": ObjDict(
         {
-            "class_words_perfection": "perfection.serializers.words.WordsPerfectionSerializer",
-            "class_words_perfection_detail": "perfection.serializers.class_.PerfectionClassWordsPerfectionDetailSerializer",
             "perfection_student": "perfection.serializers.base.PerfectionStudentSerializer",
             "words_perfection": "perfection.serializers.words.WordsPerfectionSerializer",
             "word_perfection": 'perfection.serializers.words.WordPerfectionSerializer',
             "word_perfection_simple": 'perfection.serializers.words.WordPerfectionSimpleSerializer',
-            "word_library": 'perfection.serializers.words.WordLibrarySerializer'
+            "word_library": 'perfection.serializers.words.WordLibrarySerializer',
+            "chIdioms_perfection": "perfection.serializers.chIdioms.ChIdiomsPerfectionSerializer",
+            "chIdiom_perfection": 'perfection.serializers.chIdioms.ChIdiomPerfectionSerializer',
+            "chIdiom_perfection_simple": 'perfection.serializers.chIdioms.ChIdiomPerfectionSimpleSerializer',
+            "chIdiom_library": 'perfection.serializers.chIdioms.ChIdiomLibrarySerializer',
+            "chWords_perfection": "perfection.serializers.chWords.ChWordsPerfectionSerializer",
+            "chWord_perfection": 'perfection.serializers.chWords.ChWordPerfectionSerializer',
+            "chWord_perfection_simple": 'perfection.serializers.chWords.ChWordPerfectionSimpleSerializer',
+            "chWord_library": 'perfection.serializers.chWords.ChWordLibrarySerializer',
         }
     ),
     "MODELS": ObjDict(
         {
             "words_perfection": "perfection.models.words.WordsPerfection",
-            "perfection_teacher": "perfection.models.teacher.PerfectionTeacher"
+            "chIdioms_perfection": "perfection.models.chIdioms.ChIdiomsPerfection",
+            "chWords_perfection": "perfection.models.chWords.ChWordsPerfection",
         }
     ),
     "CHOICES": ObjDict(
         {
-            "rating_choice": "perfection.models.base.RatingChoice"
+            "word_perfection_status": "perfection.models.words.WordPerfectionStatusChoices",
+            "words_perfection_status": "perfection.models.words.WordsPerfectionStatusChoices",
+            "chIdiom_perfection_status": "perfection.models.chIdioms.ChIdiomPerfectionStatusChoices",
+            "chIdioms_perfection_status": "perfection.models.chIdioms.ChIdiomsPerfectionStatusChoices",
+            "chWord_perfection_status": "perfection.models.chWords.ChWordPerfectionStatusChoices",
+            "chWords_perfection_status": "perfection.models.chWords.ChWordsPerfectionStatusChoices",
         }
     )
 }

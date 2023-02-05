@@ -1,11 +1,11 @@
 # ==============================================================================
-#  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
+#  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-12-2 21:27                                                   =
+#    @Time : 2023-2-4 23:4                                                     =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : models.py                                                         =
-#    @Program: backend                                                         =
+#    @Program: website                                                         =
 # ==============================================================================
 import shortuuid
 from django.conf import settings
@@ -97,8 +97,6 @@ class User(AbstractBaseUser, PermissionsMixin, models.Model):
     def perfection(self):
         if getattr(self, 'perfection_student', None):
             return self.perfection_student
-        elif getattr(self, 'perfection_teacher', None):
-            return self.perfection_teacher
         else:
             return None
 

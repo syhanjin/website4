@@ -2,10 +2,10 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-5 9:7                                                      =
+#    @Time : 2023-2-5 12:28                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
-#    @File : words.py                                                          =
+#    @File : chIdioms.py                                                       =
 #    @Program: website                                                         =
 # ==============================================================================
 import uuid
@@ -19,11 +19,11 @@ from perfection.utils.intervals import INTERVAL_UNACCEPTED_0, get_interval_count
 from utils import unique_random_str
 
 
-class WordManager(models.Manager):
+class ChIdiomManager(models.Manager):
     pass
 
 
-class WordLibrary(models.Model):
+class ChIdiomLibrary(models.Model):
     class Meta:
         ordering = ['name']
 
@@ -32,93 +32,88 @@ class WordLibrary(models.Model):
     is_default = models.BooleanField(verbose_name="是否为默认词库", default=True)
 
 
-class Word(models.Model):
-    """
-    说明：此为单词词库中的单词，chinese中包括词性和中文释义
-    如：
-    word: "focus"
-    chinese: "v. （使）聚集 n. 焦点,中心,聚焦"
-    """
+class ChIdiom(models.Model):
+    """    """
 
     class Meta:
         ordering = ['random']
 
-    word = models.CharField(max_length=40, verbose_name='英文')
-    symbol = models.CharField(max_length=40, verbose_name='音标', null=True)
-    chinese = models.CharField(max_length=1000, verbose_name='中文释义')
+    key = models.CharField(max_length=40, verbose_name='成语')
+    value = models.CharField(max_length=1000, verbose_name='解释')
     libraries = models.ManyToManyField(
-        WordLibrary, max_length=128, verbose_name='所属词库', related_name='words'
+        ChIdiomLibrary, max_length=128, verbose_name='所属词库', related_name='chIdioms'
     )
 
     random = models.CharField(max_length=24, primary_key=True, editable=False, unique=True, default=unique_random_str)
-    objects = WordManager()
+    objects = ChIdiomManager()
 
 
-class WordsPerfectionManager(models.Manager):
+class ChIdiomsPerfectionManager(models.Manager):
     def create(self, rest=False, *args, **kwargs):
         perfection = kwargs.get('perfection')
         if perfection is None:
             raise ValueError('必须提供‘perfection’')
         # 生成随机单词
-        total, addition_count = 30, 10
+        total, addition_count = 10, 5
         if not rest:
             _next = timezone.now() + INTERVAL_UNACCEPTED_0[0]
-            unremembered = perfection.word_perfections.filter(status=WordPerfectionStatusChoices.UNREMEMBERED)
+            unremembered = perfection.chIdiom_perfections.filter(status=ChIdiomPerfectionStatusChoices.UNREMEMBERED)
             n = total - unremembered.count()
             remember = []
-            for word in unremembered:
+            for item in unremembered:
                 # 重置下次打卡时间
-                word.next = _next
-                word.save()
-                remember.append(word)
-            excludes = perfection.word_perfections.all().values_list('word', flat=True)
-            library = QuerySet(model=Word)
-            for lib in perfection.word_libraries.all():
-                library = library | lib.words.all()
+                item.next = _next
+                item.save()
+                remember.append(item)
+            excludes = perfection.chIdiom_perfections.all().values_list('chIdiom', flat=True)
+            library = QuerySet(model=ChIdiom)
+            for lib in perfection.chIdiom_libraries.all():
+                library = library | lib.chIdioms.all()
             library = library.distinct()
-            library = library.exclude(pk__in=list(excludes.values_list("word__pk", flat=True)))
+            library = library.exclude(pk__in=list(excludes.values_list("chIdiom__pk", flat=True)))
             if n > 0:
-                for word in library[:n]:
+                for item in library[:n]:
                     remember.append(
-                        WordPerfection.objects.create(
-                            word=word, status=WordPerfectionStatusChoices.REVIEWING, next=_next
+                        ChIdiomPerfection.objects.create(
+                            chIdiom=item, status=ChIdiomPerfectionStatusChoices.REVIEWING, next=_next
                         )
                     )
             else:
                 n = 0
             # 创建附加题，假设数据库变化不会影响qs
             addition = []
-            for word in library[n:n + addition_count]:
-                addition.append(WordPerfection.objects.create(word=word))
+            for item in library[n:n + addition_count]:
+                addition.append(ChIdiomPerfection.objects.create(chIdiom=item))
         else:
             remember = []
             addition = []
-        review = perfection.get_review_words()
+        review = perfection.get_review_chIdioms()
         # print(remember, review)
         if len(remember) == 0 and len(review) == 0:
             return None
-        words_perfection = super(WordsPerfectionManager, self).create(*args, **kwargs)
-        words_perfection.review.add(*review)
-        words_perfection.remember.add(*remember)
-        words_perfection.addition.add(*addition)
-        words_perfection.save()
-        return words_perfection
+        chIdioms_perfection = super(ChIdiomsPerfectionManager, self).create(*args, **kwargs)
+        chIdioms_perfection.review.add(*review)
+        chIdioms_perfection.remember.add(*remember)
+        chIdioms_perfection.addition.add(*addition)
+        chIdioms_perfection.save()
+        return chIdioms_perfection
 
 
-class WordPerfectionStatusChoices(models.TextChoices):
+class ChIdiomPerfectionStatusChoices(models.TextChoices):
     UNREMEMBERED = "unremembered", "未记"
     REMEMBERING = "remembering", "正在记忆"
     REVIEWING = "reviewing", "正在复习"
     REMEMBERED = "remembered", "已记住"
 
 
-class WordPerfection(models.Model):
+class ChIdiomPerfection(models.Model):
     id = models.UUIDField(verbose_name="编号", primary_key=True, default=uuid.uuid4, editable=False, max_length=64)
-    word = models.ForeignKey(
-        'perfection.Word', related_name="word_perfection", verbose_name="单词信息", on_delete=models.CASCADE
+    chIdiom = models.ForeignKey(
+        'perfection.ChIdiom', related_name="chIdiom_perfection", verbose_name="单词信息", on_delete=models.CASCADE
     )
     status = models.TextField(
-        max_length=64, choices=WordPerfectionStatusChoices.choices, default=WordPerfectionStatusChoices.UNREMEMBERED
+        max_length=64, choices=ChIdiomPerfectionStatusChoices.choices,
+        default=ChIdiomPerfectionStatusChoices.UNREMEMBERED
     )
 
     unaccepted = models.PositiveIntegerField(default=0)  # 错误次数
@@ -134,34 +129,34 @@ class WordPerfection(models.Model):
         return timezone.now().date() >= self.next
 
 
-class WordsPerfectionStatusChoices(models.TextChoices):
+class ChIdiomsPerfectionStatusChoices(models.TextChoices):
     UNFINISHED = "unfinished", "未完成"
     FINISHED = "finished", "已完成"
 
 
-class WordsPerfection(models.Model):
+class ChIdiomsPerfection(models.Model):
     class Meta:
         ordering = ['-updated']
-        verbose_name = "单词打卡"
+        verbose_name = "成语打卡"
         verbose_name_plural = verbose_name
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, max_length=64)
     perfection = models.ForeignKey(
-        'perfection.PerfectionStudent', related_name="words", on_delete=models.CASCADE
+        'perfection.PerfectionStudent', related_name="chIdioms", on_delete=models.CASCADE
     )  # 单词打卡只能是学生
     remember = models.ManyToManyField(
-        'perfection.WordPerfection', verbose_name="记忆单词", related_name="words_remember"
+        'perfection.ChIdiomPerfection', verbose_name="记忆单词", related_name="chIdioms_remember"
     )
     review = models.ManyToManyField(
-        'perfection.WordPerfection', verbose_name="复习单词", related_name="words_review"
+        'perfection.ChIdiomPerfection', verbose_name="复习单词", related_name="chIdioms_review"
     )
     addition = models.ManyToManyField(
-        'perfection.WordPerfection', verbose_name="附加题", related_name="words_addition"
+        'perfection.ChIdiomPerfection', verbose_name="附加题", related_name="chIdioms_addition"
     )
     unremembered = models.ManyToManyField(
-        'perfection.WordPerfection', verbose_name="错误单词", related_name="words_unremembered"
+        'perfection.ChIdiomPerfection', verbose_name="错误单词", related_name="chIdioms_unremembered"
     )
-    picture = models.ManyToManyField('images.Image', verbose_name="打卡内容图片", related_name="words")
+    picture = models.ManyToManyField('images.Image', verbose_name="打卡内容图片", related_name="chIdioms")
 
     # accepted = models.FloatField(default=0)
 
@@ -170,10 +165,11 @@ class WordsPerfection(models.Model):
     finished = models.DateTimeField(verbose_name="完成打卡任务时间", null=True)
 
     status = models.TextField(
-        max_length=128, choices=WordsPerfectionStatusChoices.choices, default=WordsPerfectionStatusChoices.UNFINISHED
+        max_length=128, choices=ChIdiomsPerfectionStatusChoices.choices,
+        default=ChIdiomsPerfectionStatusChoices.UNFINISHED
     )
 
-    objects = WordsPerfectionManager()
+    objects = ChIdiomsPerfectionManager()
     REQUIRED_FIELDS = ['perfection', ]
     SUMMARY_FIELDS = [
         'id', 'perfection',
@@ -184,49 +180,49 @@ class WordsPerfection(models.Model):
     # FINISH_REQUIRED_FIELDS = ['accepted', 'picture']
     # PUBLIC_FIELDS = ['perfection', 'remember', 'review']
 
-    def update_words(self, review, addition):
+    def update_chIdioms(self, review, addition):
         # 处理单词
-        def update_word(word_, is_accepted, mode="review"):
-            word_.previous = now
-            word_.total += 1
+        def update_chIdiom(chIdiom_, is_accepted, mode="review"):
+            chIdiom_.previous = now
+            chIdiom_.total += 1
             if is_accepted:
-                word_.count += 1
-                if word_.known or word_.count >= get_interval_count(word_):
-                    word_.status = WordPerfectionStatusChoices.REMEMBERED
+                chIdiom_.count += 1
+                if chIdiom_.known or chIdiom_.count >= get_interval_count(chIdiom_):
+                    chIdiom_.status = ChIdiomPerfectionStatusChoices.REMEMBERED
                 else:
                     if mode == "review":
-                        interval = get_next_interval(word_, 2)
+                        interval = get_next_interval(chIdiom_, 2)
                     elif mode == "addition":
-                        word.known = True
-                        interval = get_next_interval(word_, 0)
+                        chIdiom_.known = True
+                        interval = get_next_interval(chIdiom_, 0)
                     else:
                         raise ValueError()
-                    word_.next = now + interval
-                    word_.status = WordPerfectionStatusChoices.REVIEWING
+                    chIdiom_.next = now + interval
+                    chIdiom_.status = ChIdiomPerfectionStatusChoices.REVIEWING
             else:
-                word_.status = WordPerfectionStatusChoices.UNREMEMBERED
-                word_.count = 0
-                word_.known = False
-                word_.unaccepted += 1
+                chIdiom_.status = ChIdiomPerfectionStatusChoices.UNREMEMBERED
+                chIdiom_.count = 0
+                chIdiom_.known = False
+                chIdiom_.unaccepted += 1
                 if mode == "review":
-                    self.unremembered.add(word_)
-            word_.save()
+                    self.unremembered.add(chIdiom_)
+            chIdiom_.save()
 
         now = timezone.now()
-        for word in self.review.all():
-            update_word(word, review[word.word.word], mode="review")
-        for word in self.addition.all():
-            update_word(word, addition[word.word.word], mode="addition")
+        for item in self.review.all():
+            update_chIdiom(item, review[item.chIdiom.key], mode="review")
+        for item in self.addition.all():
+            update_chIdiom(item, addition[item.chIdiom.key], mode="addition")
         self.unremembered.distinct()
         self.save()
 
     @property
-    def unremembered_words(self) -> QuerySet:
+    def unremembered_chIdioms(self) -> QuerySet:
         return self.unremembered.all()
 
     @property
     def unaccepted(self) -> int:
-        return self.unremembered_words.count()
+        return self.unremembered_chIdioms.count()
 
     @property
     def total(self) -> int:
@@ -234,7 +230,7 @@ class WordsPerfection(models.Model):
 
     @property
     def accuracy(self) -> Optional[float]:
-        if self.status == WordsPerfectionStatusChoices.UNFINISHED:
+        if self.status == ChIdiomsPerfectionStatusChoices.UNFINISHED:
             return None
         if self.total == 0:
             return 1
@@ -242,7 +238,7 @@ class WordsPerfection(models.Model):
 
     @property
     def accuracy_str(self) -> Optional[str]:
-        if self.status == WordsPerfectionStatusChoices.UNFINISHED:
+        if self.status == ChIdiomsPerfectionStatusChoices.UNFINISHED:
             return None
         return '%.2f%%' % (self.accuracy * 100)
 

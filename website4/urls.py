@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 # ==============================================================================
-#  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
+#  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-8-21 21:44                                                   =
+#    @Time : 2023-2-5 13:40                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : urls.py                                                           =
@@ -35,16 +35,13 @@ router.register(r'users', account.views.UserViewSet)
 router.register(r'notice', basis.views.NoticeViewSet)
 router.register(r'app', basis.views.AppViewSet)
 router.register(r'perfection/student', perfection.views.PerfectionStudentViewSet)
-router.register(r'perfection/teacher', perfection.views.PerfectionTeacherViewSet)
 router.register(r'perfection/words', perfection.views.WordsPerfectionViewSet)
 router.register(r'perfection/word_libraries', perfection.views.WordLibraryViewSet)
-router.register(r'perfection/class', perfection.views.PerfectionClassViewSet)
-router.register(r'perfection/subject', perfection.views.PerfectionSubjectViewSet)
+router.register(r'perfection/chIdioms', perfection.views.ChIdiomsPerfectionViewSet)
+router.register(r'perfection/chIdiom_libraries', perfection.views.ChIdiomLibraryViewSet)
+router.register(r'perfection/chWords', perfection.views.ChWordsPerfectionViewSet)
+router.register(r'perfection/chWord_libraries', perfection.views.ChWordLibraryViewSet)
 router.register(r'getui/cid', getui.views.CidViewSet)
-
-class_router = routers.NestedSimpleRouter(router, r'perfection/class', lookup='class')
-class_router.register(r'subject', perfection.views.PerfectionClassSubjectViewSet, basename='class-subject')
-class_router.register(r'students', perfection.views.PerfectionClassStudentViewSet, basename='class-student')
 
 urlpatterns = [  # 管理员系统
     # re_path(r'^admin/', admin.site.urls), # 自己搭一个，这个不用了
@@ -56,7 +53,6 @@ urlpatterns += [
 urlpatterns += [  # api
     # path("api/v1/", include("djoser.urls")),
     path(settings.BASE_URL, include(router.urls)),
-    path(settings.BASE_URL, include(class_router.urls)),
 ]
 
 # 媒体静态文件 设计成由django处理但是不由django路由

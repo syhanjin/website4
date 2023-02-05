@@ -3,23 +3,23 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-4 23:29                                                    =
+#    @Time : 2023-2-5 12:20                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
-#    @File : words.py                                                          =
+#    @File : chIdioms.py                                                       =
 #    @Program: website                                                         =
 # ==============================================================================
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
 from images.serializers import ImageSerializer
-from perfection.models.words import WordLibrary, WordPerfection, WordsPerfection
+from perfection.models.chIdioms import ChIdiomLibrary, ChIdiomPerfection, ChIdiomsPerfection
 
 
-class WordsPerfectionSerializer(serializers.ModelSerializer):
+class ChIdiomsPerfectionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordsPerfection
-        fields = WordsPerfection.SUMMARY_FIELDS + ['acc_str', 'acc', 'user']
+        model = ChIdiomsPerfection
+        fields = ChIdiomsPerfection.SUMMARY_FIELDS + ['acc_str', 'acc', 'user']
 
     # picture = serializers.SerializerMethodField(read_only=True)
     picture = ImageSerializer(many=True)
@@ -40,9 +40,9 @@ class WordsPerfectionSerializer(serializers.ModelSerializer):
     #     return images
 
 
-class WordsPerfectionListSerializer(serializers.ModelSerializer):
+class ChIdiomsPerfectionListSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordsPerfection
+        model = ChIdiomsPerfection
         fields = ['id', 'updated', 'status', 'acc']
 
     acc = serializers.SerializerMethodField(read_only=True)
@@ -51,86 +51,83 @@ class WordsPerfectionListSerializer(serializers.ModelSerializer):
         return obj.accuracy
 
 
-class WordPerfectionSerializer(serializers.ModelSerializer):
+class ChIdiomPerfectionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordPerfection
+        model = ChIdiomPerfection
         fields = '__all__'
 
-    word = serializers.SerializerMethodField(read_only=True)
+    chIdiom = serializers.SerializerMethodField(read_only=True)
 
-    def get_word(self, obj):
+    def get_chIdiom(self, obj):
         return {
-            'word': obj.word.word,
-            'chinese': obj.word.chinese,
-            'symbol': obj.word.symbol
+            'key': obj.chIdiom.key,
+            'value': obj.chIdiom.value,
         }
 
 
-class WordPerfectionSimpleSerializer(serializers.ModelSerializer):
+class ChIdiomPerfectionSimpleSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordPerfection
-        fields = ['word', 'symbol', 'chinese']
+        model = ChIdiomPerfection
+        fields = ['key', 'value']
 
-    word = serializers.CharField(source='word.word')
-    symbol = serializers.CharField(source='word.symbol')
-    chinese = serializers.CharField(source='word.chinese')
-    # library = serializers.CharField(source='word.library.name')
+    key = serializers.CharField(source='chIdiom.key')
+    value = serializers.CharField(source='chIdiom.value')
 
 
-class WordsPerfectionRememberSerializer(serializers.ModelSerializer):
+class ChIdiomsPerfectionRememberSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordsPerfection
+        model = ChIdiomsPerfection
         fields = ['updated', 'remember']
 
-    remember = WordPerfectionSimpleSerializer(many=True)
+    remember = ChIdiomPerfectionSimpleSerializer(many=True)
 
 
-class WordsPerfectionUnrememberedSerializer(serializers.ModelSerializer):
+class ChIdiomsPerfectionUnrememberedSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordsPerfection
+        model = ChIdiomsPerfection
         fields = ['updated', 'unremembered']
 
-    unremembered = WordPerfectionSimpleSerializer(many=True)
+    unremembered = ChIdiomPerfectionSimpleSerializer(many=True)
 
 
-class WordsPerfectionReviewSerializer(serializers.ModelSerializer):
+class ChIdiomsPerfectionReviewSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordsPerfection
+        model = ChIdiomsPerfection
         fields = ['updated', 'review']
 
-    review = WordPerfectionSimpleSerializer(many=True)
+    review = ChIdiomPerfectionSimpleSerializer(many=True)
 
 
-class WordsPerfectionAdditionSerializer(serializers.ModelSerializer):
+class ChIdiomsPerfectionAdditionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordsPerfection
+        model = ChIdiomsPerfection
         fields = ['updated', 'addition']
 
-    addition = WordPerfectionSimpleSerializer(many=True)
+    addition = ChIdiomPerfectionSimpleSerializer(many=True)
 
 
-class WordsPerfectionAllWordsSerializer(serializers.ModelSerializer):
+class ChIdiomsPerfectionAllChIdiomsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordsPerfection
+        model = ChIdiomsPerfection
         fields = ['updated', 'remember', 'review', 'addition']
 
-    remember = WordPerfectionSimpleSerializer(many=True)
-    review = WordPerfectionSimpleSerializer(many=True)
-    addition = WordPerfectionSimpleSerializer(many=True)
+    remember = ChIdiomPerfectionSimpleSerializer(many=True)
+    review = ChIdiomPerfectionSimpleSerializer(many=True)
+    addition = ChIdiomPerfectionSimpleSerializer(many=True)
 
 
-class WordLibrarySerializer(serializers.ModelSerializer):
+class ChIdiomLibrarySerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordLibrary
+        model = ChIdiomLibrary
         fields = ['id', 'name', 'is_default', 'total']
 
     total = serializers.SerializerMethodField(read_only=True)
 
     def get_total(self, obj):
-        return obj.words.count()
+        return obj.chIdioms.count()
 
 
-class WordsPerfectionFinishSerializer(serializers.ModelSerializer):
+class ChIdiomsPerfectionFinishSerializer(serializers.ModelSerializer):
     # remember = serializers.ListField(child=serializers.BooleanField())
     # review = serializers.ListField(child=serializers.BooleanField())
     # remember = serializers.DictField(child=serializers.BooleanField())
@@ -139,7 +136,7 @@ class WordsPerfectionFinishSerializer(serializers.ModelSerializer):
     picture = serializers.ListField(child=Base64ImageField(), max_length=3, min_length=1)
 
     class Meta:
-        model = WordsPerfection
+        model = ChIdiomsPerfection
         fields = ['review', 'addition', 'picture']
 
     def validate_picture(self, attr):

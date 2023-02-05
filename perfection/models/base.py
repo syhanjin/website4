@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
 # ==============================================================================
-#  Copyright (C) 2022 Sakuyark, Inc. All Rights Reserved                       =
+#  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2022-12-2 20:38                                                   =
+#    @Time : 2023-2-5 13:32                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : base.py                                                           =
-#    @Program: backend                                                         =
+#    @Program: website                                                         =
 # ==============================================================================
 import uuid
 
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models import QuerySet
 from django.utils import timezone
+
+from perfection.conf import settings
 
 User = get_user_model()
 
@@ -25,61 +28,65 @@ class PerfectionStudent(models.Model):
     id = models.UUIDField(verbose_name="编号", primary_key=True, default=uuid.uuid4, editable=False, max_length=64)
 
     user = models.OneToOneField(to=User, related_name="perfection_student", on_delete=models.CASCADE)
-    teachers = models.ManyToManyField('perfection.PerfectionTeacher', related_name="students")
     # 单词打卡部分
-    remembered_words = models.ManyToManyField(
-        'perfection.WordPerfection', verbose_name="完成词库", related_name='remembered_perfection'
-    )
-    reviewing_words = models.ManyToManyField(
-        'perfection.WordPerfection', verbose_name="复习词库", related_name='reviewing_perfection'
-    )
-    unremembered_words = models.ManyToManyField(
-        'perfection.WordPerfection', verbose_name="保持词库", related_name='unremembered_perfection'
+    word_perfections = models.ManyToManyField(
+        'perfection.WordPerfection', related_name="perfection_student"
     )
     word_libraries = models.ManyToManyField(
-        'perfection.WordLibrary', verbose_name="未记词库", related_name='libraries_perfection'
+        'perfection.WordLibrary', verbose_name="单词词库", related_name='libraries_perfection'
     )
-    # words = models.ManyToManyField(WordsPerfection, verbose_name="打卡", related_name="perfection")
-    # role = models.CharField(
-    #     choices=PerfectionRoleChoice.choices, default=PerfectionRoleChoice.STUDENT, max_length=32, editable=False
-    # )
+
+    chIdiom_perfections = models.ManyToManyField(
+        'perfection.chIdiomPerfection', related_name="perfection_student"
+    )
+    chIdiom_libraries = models.ManyToManyField(
+        'perfection.chIdiomLibrary', verbose_name="成语词库", related_name='libraries_perfection'
+    )
+
+    chWord_perfections = models.ManyToManyField(
+        'perfection.chWordPerfection', related_name="perfection_student"
+    )
+    chWord_libraries = models.ManyToManyField(
+        'perfection.chWordLibrary', verbose_name="成语词库", related_name='libraries_perfection'
+    )
     role = 'student'
     objects = PerfectionStudentManager()
 
     SUMMARY_FIELDS = [
-        'id', 'user', 'role',
-        'unremembered_words', 'reviewing_words', 'remembered_words', 'word_libraries'
+        'id', 'user', 'role', 'word_libraries', 'chIdiom_libraries', 'chWord_libraries'
     ]
 
     def __unicode__(self):
         return self.user.name + '_PERFECTION'
 
-    # 以下内容在多次调用时可以优化，暂时不进行优化
-    def get_review_words(self) -> list:
-        # 因为不太会搞只能用这种比较贵的方法
-        rel = []
-        for word in self.reviewing_words.all():
-            if word.need_to_review:
-                rel.append(word)
-        return rel
+    def get_review_words(self) -> QuerySet:
+        return self.word_perfections.filter(
+            status=settings.CHOICES.word_perfection_status.REVIEWING, next__lte=timezone.now()
+        )
+
+    def get_review_chIdioms(self) -> QuerySet:
+        return self.chIdiom_perfections.filter(
+            status=settings.CHOICES.chIdiom_perfection_status.REVIEWING, next__lte=timezone.now()
+        )
+
+    def get_review_chWords(self) -> QuerySet:
+        return self.chWord_perfections.filter(
+            status=settings.CHOICES.chWord_perfection_status.REVIEWING, next__lte=timezone.now()
+        )
 
     @property
     def missed_words_perfection(self):
         latest = self.get_latest(self.words)
-        if latest is None:
-            return False
-        return not latest or ((not latest.is_finished) and latest.created.date() != timezone.now().date())
+        return not latest or (
+                latest.status != settings.CHOICES.words_perfection_status.FINISHED
+                and latest.created.date() < timezone.now().date()
+        )
 
     @property
     def has_unfinished_words_perfection(self):
         latest = self.get_latest(self.words)
-        return not latest or (not latest.is_finished)
+        return not latest or latest.status != settings.CHOICES.words_perfection_status.FINISHED
 
     @staticmethod
     def get_latest(model):
         return model.all().order_by("-updated").first()
-
-
-class RatingChoice(models.TextChoices):
-    PASS = "pass", "通过"
-    FAIL = "fail", "不通过"

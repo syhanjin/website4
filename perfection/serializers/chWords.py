@@ -3,23 +3,23 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-4 23:29                                                    =
+#    @Time : 2023-2-5 13:27                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
-#    @File : words.py                                                          =
+#    @File : chWords.py                                                        =
 #    @Program: website                                                         =
 # ==============================================================================
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
 from images.serializers import ImageSerializer
-from perfection.models.words import WordLibrary, WordPerfection, WordsPerfection
+from perfection.models.chWords import ChWordLibrary, ChWordPerfection, ChWordsPerfection
 
 
-class WordsPerfectionSerializer(serializers.ModelSerializer):
+class ChWordsPerfectionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordsPerfection
-        fields = WordsPerfection.SUMMARY_FIELDS + ['acc_str', 'acc', 'user']
+        model = ChWordsPerfection
+        fields = ChWordsPerfection.SUMMARY_FIELDS + ['acc_str', 'acc', 'user']
 
     # picture = serializers.SerializerMethodField(read_only=True)
     picture = ImageSerializer(many=True)
@@ -40,9 +40,9 @@ class WordsPerfectionSerializer(serializers.ModelSerializer):
     #     return images
 
 
-class WordsPerfectionListSerializer(serializers.ModelSerializer):
+class ChWordsPerfectionListSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordsPerfection
+        model = ChWordsPerfection
         fields = ['id', 'updated', 'status', 'acc']
 
     acc = serializers.SerializerMethodField(read_only=True)
@@ -51,86 +51,85 @@ class WordsPerfectionListSerializer(serializers.ModelSerializer):
         return obj.accuracy
 
 
-class WordPerfectionSerializer(serializers.ModelSerializer):
+class ChWordPerfectionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordPerfection
+        model = ChWordPerfection
         fields = '__all__'
 
-    word = serializers.SerializerMethodField(read_only=True)
+    chWord = serializers.SerializerMethodField(read_only=True)
 
-    def get_word(self, obj):
+    def get_chWord(self, obj):
         return {
-            'word': obj.word.word,
-            'chinese': obj.word.chinese,
-            'symbol': obj.word.symbol
+            'key': obj.chWord.key,
+            'sentence': obj.chWord.sentence,
+            'value': obj.chWord.value,
         }
 
 
-class WordPerfectionSimpleSerializer(serializers.ModelSerializer):
+class ChWordPerfectionSimpleSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordPerfection
-        fields = ['word', 'symbol', 'chinese']
+        model = ChWordPerfection
+        fields = ['key', 'value']
 
-    word = serializers.CharField(source='word.word')
-    symbol = serializers.CharField(source='word.symbol')
-    chinese = serializers.CharField(source='word.chinese')
-    # library = serializers.CharField(source='word.library.name')
+    key = serializers.CharField(source='chWord.key')
+    sentence = serializers.CharField(source='chWord.sentence')
+    value = serializers.CharField(source='chWord.value')
 
 
-class WordsPerfectionRememberSerializer(serializers.ModelSerializer):
+class ChWordsPerfectionRememberSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordsPerfection
+        model = ChWordsPerfection
         fields = ['updated', 'remember']
 
-    remember = WordPerfectionSimpleSerializer(many=True)
+    remember = ChWordPerfectionSimpleSerializer(many=True)
 
 
-class WordsPerfectionUnrememberedSerializer(serializers.ModelSerializer):
+class ChWordsPerfectionUnrememberedSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordsPerfection
+        model = ChWordsPerfection
         fields = ['updated', 'unremembered']
 
-    unremembered = WordPerfectionSimpleSerializer(many=True)
+    unremembered = ChWordPerfectionSimpleSerializer(many=True)
 
 
-class WordsPerfectionReviewSerializer(serializers.ModelSerializer):
+class ChWordsPerfectionReviewSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordsPerfection
+        model = ChWordsPerfection
         fields = ['updated', 'review']
 
-    review = WordPerfectionSimpleSerializer(many=True)
+    review = ChWordPerfectionSimpleSerializer(many=True)
 
 
-class WordsPerfectionAdditionSerializer(serializers.ModelSerializer):
+class ChWordsPerfectionAdditionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordsPerfection
+        model = ChWordsPerfection
         fields = ['updated', 'addition']
 
-    addition = WordPerfectionSimpleSerializer(many=True)
+    addition = ChWordPerfectionSimpleSerializer(many=True)
 
 
-class WordsPerfectionAllWordsSerializer(serializers.ModelSerializer):
+class ChWordsPerfectionAllChWordsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordsPerfection
+        model = ChWordsPerfection
         fields = ['updated', 'remember', 'review', 'addition']
 
-    remember = WordPerfectionSimpleSerializer(many=True)
-    review = WordPerfectionSimpleSerializer(many=True)
-    addition = WordPerfectionSimpleSerializer(many=True)
+    remember = ChWordPerfectionSimpleSerializer(many=True)
+    review = ChWordPerfectionSimpleSerializer(many=True)
+    addition = ChWordPerfectionSimpleSerializer(many=True)
 
 
-class WordLibrarySerializer(serializers.ModelSerializer):
+class ChWordLibrarySerializer(serializers.ModelSerializer):
     class Meta:
-        model = WordLibrary
+        model = ChWordLibrary
         fields = ['id', 'name', 'is_default', 'total']
 
     total = serializers.SerializerMethodField(read_only=True)
 
     def get_total(self, obj):
-        return obj.words.count()
+        return obj.chWords.count()
 
 
-class WordsPerfectionFinishSerializer(serializers.ModelSerializer):
+class ChWordsPerfectionFinishSerializer(serializers.ModelSerializer):
     # remember = serializers.ListField(child=serializers.BooleanField())
     # review = serializers.ListField(child=serializers.BooleanField())
     # remember = serializers.DictField(child=serializers.BooleanField())
@@ -139,7 +138,7 @@ class WordsPerfectionFinishSerializer(serializers.ModelSerializer):
     picture = serializers.ListField(child=Base64ImageField(), max_length=3, min_length=1)
 
     class Meta:
-        model = WordsPerfection
+        model = ChWordsPerfection
         fields = ['review', 'addition', 'picture']
 
     def validate_picture(self, attr):
