@@ -14,7 +14,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-1-29 19:4                                                    =
+#    @Time : 2023-2-5 14:39                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : prod.py                                                           =
@@ -210,7 +210,12 @@ HOST_URL = "http://127.0.0.1"
 BASE_URL = "api/v1/"
 
 CRONJOBS = [
-    ('*/30 * * * *', 'perfection.admin.create_words_perfections', f'>>{BASE_DIR}/logs/perfection_create.log 2>&1 &'),
+    ('*/30 * * * *', 'perfection.admin.create_words_perfections',
+     f'>>{BASE_DIR}/logs/perfection_words_create.log 2>&1 &'),
+    ('*/30 * * * *', 'perfection.admin.create_chIdioms_perfections',
+     f'>>{BASE_DIR}/logs/perfection_chIdioms_create.log 2>&1 &'),
+    ('*/30 * * * *', 'perfection.admin.create_chWords_perfections',
+     f'>>{BASE_DIR}/logs/perfection_chWords_create.log 2>&1 &'),
     ('*/5 * * * *', 'getui.admin.clean_notifications', f'>>{BASE_DIR}/logs/getui_clean.log 2>&1 &')
 ]
 # 个推信息设置
