@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-5 13:32                                                    =
+#    @Time : 2023-2-5 22:25                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -22,7 +22,8 @@ from rest_framework.response import Response
 from images.models import Image
 from perfection.models.base import PerfectionStudent
 from perfection.serializers.base import (
-    PerfectionStudentChIdiomLibrariesSetSerializer, PerfectionStudentCreateSerializer, PerfectionStudentSerializer,
+    PerfectionStudentChIdiomLibrariesSetSerializer, PerfectionStudentChWordLibrariesSetSerializer,
+    PerfectionStudentCreateSerializer, PerfectionStudentSerializer,
     PerfectionStudentWordLibrariesSetSerializer,
 )
 from perfection.utils.build_chIdiom_pdf import to_pdf as to_chIdiom_pdf
