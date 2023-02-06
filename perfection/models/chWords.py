@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-5 14:19                                                    =
+#    @Time : 2023-2-6 22:26                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : chWords.py                                                        =
@@ -74,11 +74,11 @@ class ChWordsPerfectionManager(models.Manager):
             library = library.exclude(pk__in=list(excludes.values_list("chWord__pk", flat=True)))
             if n > 0:
                 for item in library[:n]:
-                    remember.append(
-                        ChWordPerfection.objects.create(
-                            chWord=item, status=ChWordPerfectionStatusChoices.REVIEWING, next=_next
-                        )
+                    obj = ChWordPerfection.objects.create(
+                        chWord=item, status=ChWordPerfectionStatusChoices.REVIEWING, next=_next
                     )
+                    perfection.chWord_perfections.add(obj)
+                    remember.append(obj)
             else:
                 n = 0
             # 创建附加题，假设数据库变化不会影响qs
@@ -97,6 +97,7 @@ class ChWordsPerfectionManager(models.Manager):
         chWords_perfection.remember.add(*remember)
         chWords_perfection.addition.add(*addition)
         chWords_perfection.save()
+        perfection.save()
         return chWords_perfection
 
 

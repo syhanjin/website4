@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-5 9:7                                                      =
+#    @Time : 2023-2-6 22:29                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -79,11 +79,11 @@ class WordsPerfectionManager(models.Manager):
             library = library.exclude(pk__in=list(excludes.values_list("word__pk", flat=True)))
             if n > 0:
                 for word in library[:n]:
-                    remember.append(
-                        WordPerfection.objects.create(
-                            word=word, status=WordPerfectionStatusChoices.REVIEWING, next=_next
-                        )
+                    obj = WordPerfection.objects.create(
+                        word=word, status=WordPerfectionStatusChoices.REVIEWING, next=_next
                     )
+                    perfection.word_perfections.add(obj)
+                    remember.append(obj)
             else:
                 n = 0
             # 创建附加题，假设数据库变化不会影响qs
@@ -102,6 +102,7 @@ class WordsPerfectionManager(models.Manager):
         words_perfection.remember.add(*remember)
         words_perfection.addition.add(*addition)
         words_perfection.save()
+        perfection.save()
         return words_perfection
 
 

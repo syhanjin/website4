@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-5 12:28                                                    =
+#    @Time : 2023-2-6 22:29                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : chIdioms.py                                                       =
@@ -73,11 +73,11 @@ class ChIdiomsPerfectionManager(models.Manager):
             library = library.exclude(pk__in=list(excludes.values_list("chIdiom__pk", flat=True)))
             if n > 0:
                 for item in library[:n]:
-                    remember.append(
-                        ChIdiomPerfection.objects.create(
-                            chIdiom=item, status=ChIdiomPerfectionStatusChoices.REVIEWING, next=_next
-                        )
+                    obj = ChIdiomPerfection.objects.create(
+                        chIdiom=item, status=ChIdiomPerfectionStatusChoices.REVIEWING, next=_next
                     )
+                    perfection.chIdiom_perfections.add(obj)
+                    remember.append(obj)
             else:
                 n = 0
             # 创建附加题，假设数据库变化不会影响qs
@@ -96,6 +96,7 @@ class ChIdiomsPerfectionManager(models.Manager):
         chIdioms_perfection.remember.add(*remember)
         chIdioms_perfection.addition.add(*addition)
         chIdioms_perfection.save()
+        perfection.save()
         return chIdioms_perfection
 
 
