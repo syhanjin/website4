@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-6 22:29                                                    =
+#    @Time : 2023-2-8 22:58                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -89,7 +89,9 @@ class WordsPerfectionManager(models.Manager):
             # 创建附加题，假设数据库变化不会影响qs
             addition = []
             for word in library[n:n + addition_count]:
-                addition.append(WordPerfection.objects.create(word=word))
+                obj = WordPerfection.objects.create(word=word)
+                perfection.word_perfections.add(obj)
+                addition.append(obj)
         else:
             remember = []
             addition = []

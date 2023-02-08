@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-5 14:37                                                    =
+#    @Time : 2023-2-8 22:56                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -153,8 +153,8 @@ def create_words_perfections():
 
 def create_chIdioms_perfections():
     now = timezone.now()
-    # if not (TIME_RANGE[0] <= now.time() <= TIME_RANGE[1]):
-    #     return
+    if not (TIME_RANGE[0] <= now.time() <= TIME_RANGE[1]):
+        return
     is_rest, is_remind = now.weekday() == 6, _is_remind(now)
     is_rest = False
     date_str = now.__format__('%Y-%m-%d')
@@ -248,8 +248,8 @@ def load_chIdiom_list(path):
 
 def create_chWords_perfections():
     now = timezone.now()
-    # if not (TIME_RANGE[0] <= now.time() <= TIME_RANGE[1]):
-    #     return
+    if not (TIME_RANGE[0] <= now.time() <= TIME_RANGE[1]):
+        return
     is_rest, is_remind = now.weekday() == 6, _is_remind(now)
     is_rest = False
     add_cnt, upd_cnt = 0, 0
