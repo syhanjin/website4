@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-8 22:43                                                    =
+#    @Time : 2023-2-13 0:3                                                     =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : chWords.py                                                        =
@@ -214,9 +214,9 @@ class ChWordsPerfection(models.Model):
 
         now = timezone.now()
         for item in self.review.all():
-            update_chWord(item, review[item.chWord.key], mode="review")
+            update_chWord(item, review[item.chWord.random], mode="review")
         for item in self.addition.all():
-            update_chWord(item, addition[item.chWord.key], mode="addition")
+            update_chWord(item, addition[item.chWord.random], mode="addition")
         self.unremembered.distinct()
         self.save()
 

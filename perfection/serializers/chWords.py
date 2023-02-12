@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-5 15:17                                                    =
+#    @Time : 2023-2-13 0:1                                                     =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : chWords.py                                                        =
@@ -60,6 +60,7 @@ class ChWordPerfectionSerializer(serializers.ModelSerializer):
 
     def get_chWord(self, obj):
         return {
+            "random": obj.chWord.random,
             'key': obj.chWord.key,
             'sentence': obj.chWord.sentence,
             'value': obj.chWord.value,
@@ -69,8 +70,9 @@ class ChWordPerfectionSerializer(serializers.ModelSerializer):
 class ChWordPerfectionSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChWordPerfection
-        fields = ['key', 'sentence', 'value']
+        fields = ['key', 'sentence', 'value', "random"]
 
+    random = serializers.CharField(source='chWord.random')
     key = serializers.CharField(source='chWord.key')
     sentence = serializers.CharField(source='chWord.sentence')
     value = serializers.CharField(source='chWord.value')

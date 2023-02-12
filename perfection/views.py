@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-5 22:25                                                    =
+#    @Time : 2023-2-13 0:2                                                     =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -618,11 +618,11 @@ class ChWordsPerfectionViewSet(viewsets.ModelViewSet):
         if len(errors.keys()) > 0:
             return Response(status=status.HTTP_400_BAD_REQUEST, data=errors)
         # 查验传入字典的单词
-        review_errors = [x for x in data['review'].keys() if x not in review.values_list('chWord__key', flat=True)]
+        review_errors = [x for x in data['review'].keys() if x not in review.values_list('chWord__random', flat=True)]
         if len(review_errors) > 0:
             errors['review'] = f"{review_errors} 不是本次「打卡版·正常」的单词"
         addition_errors = [x for x in data['addition'].keys() if
-                           x not in addition.values_list('chWord__key', flat=True)]
+                           x not in addition.values_list('chWord__random', flat=True)]
         if len(addition_errors) > 0:
             errors['addition'] = f"{addition_errors} 不是本次「打卡版·附加」的单词"
         if len(errors.keys()) > 0:
