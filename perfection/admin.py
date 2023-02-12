@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-8 22:56                                                    =
+#    @Time : 2023-2-10 23:35                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -215,7 +215,7 @@ def load_chIdiom_list(path):
         # f"注意：之前已经导入过得单词将从原词库移除并编入该词库，之前的词义将被覆盖"
     )
     if not {'成语', '解释'} <= set(columns):
-        raise ValueError('单词列表文件需包含 “成语” “解释” 两列')
+        raise ValueError('成语列表文件需包含 “成语” “解释” 两列')
     for idx, row in chIdiom_list.iterrows():
         _key = row['成语'].replace(' ', "")
         _value = row['解释'].strip()
