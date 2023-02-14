@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-8 22:58                                                    =
+#    @Time : 2023-2-14 22:34                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -65,12 +65,7 @@ class WordsPerfectionManager(models.Manager):
             _next = timezone.now() + INTERVAL_UNACCEPTED_0[0]
             unremembered = perfection.word_perfections.filter(status=WordPerfectionStatusChoices.UNREMEMBERED)
             n = total - unremembered.count()
-            remember = []
-            for word in unremembered:
-                # 重置下次打卡时间
-                word.next = _next
-                word.save()
-                remember.append(word)
+            remember = list(unremembered)
             excludes = perfection.word_perfections.all().values_list('word', flat=True)
             library = QuerySet(model=Word)
             for lib in perfection.word_libraries.all():
@@ -80,7 +75,7 @@ class WordsPerfectionManager(models.Manager):
             if n > 0:
                 for word in library[:n]:
                     obj = WordPerfection.objects.create(
-                        word=word, status=WordPerfectionStatusChoices.REVIEWING, next=_next
+                        word=word, status=WordPerfectionStatusChoices.REMEMBERING
                     )
                     perfection.word_perfections.add(obj)
                     remember.append(obj)
@@ -189,6 +184,8 @@ class WordsPerfection(models.Model):
 
     def update_words(self, review, addition):
         # 处理单词
+        now = timezone.now()
+
         def update_word(word_, is_accepted, mode="review"):
             word_.previous = now
             word_.total += 1
@@ -215,12 +212,17 @@ class WordsPerfection(models.Model):
                     self.unremembered.add(word_)
             word_.save()
 
-        now = timezone.now()
         for word in self.review.all():
             update_word(word, review[word.word.word], mode="review")
         for word in self.addition.all():
             update_word(word, addition[word.word.word], mode="addition")
         self.unremembered.distinct()
+        # 处理记忆版
+        _next = now + get_next_interval(None, 1)
+        for item in self.remember.all():
+            item.next = _next
+            item.status = WordPerfectionStatusChoices.REVIEWING
+            item.save()
         self.save()
 
     @property

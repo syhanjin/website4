@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-8 22:42                                                    =
+#    @Time : 2023-2-14 22:34                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : chIdioms.py                                                       =
@@ -54,17 +54,12 @@ class ChIdiomsPerfectionManager(models.Manager):
         if perfection is None:
             raise ValueError('必须提供‘perfection’')
         # 生成随机单词
-        total, addition_count = 10, 5
+        total, addition_count = 5, 2
         if not rest:
             _next = timezone.now() + INTERVAL_UNACCEPTED_0[0]
             unremembered = perfection.chIdiom_perfections.filter(status=ChIdiomPerfectionStatusChoices.UNREMEMBERED)
             n = total - unremembered.count()
-            remember = []
-            for item in unremembered:
-                # 重置下次打卡时间
-                item.next = _next
-                item.save()
-                remember.append(item)
+            remember = list(unremembered)
             excludes = perfection.chIdiom_perfections.all().values_list('chIdiom', flat=True)
             library = QuerySet(model=ChIdiom)
             for lib in perfection.chIdiom_libraries.all():
@@ -74,7 +69,7 @@ class ChIdiomsPerfectionManager(models.Manager):
             if n > 0:
                 for item in library[:n]:
                     obj = ChIdiomPerfection.objects.create(
-                        chIdiom=item, status=ChIdiomPerfectionStatusChoices.REVIEWING, next=_next
+                        chIdiom=item, status=ChIdiomPerfectionStatusChoices.REMEMBERING
                     )
                     perfection.chIdiom_perfections.add(obj)
                     remember.append(obj)
@@ -185,6 +180,8 @@ class ChIdiomsPerfection(models.Model):
 
     def update_chIdioms(self, review, addition):
         # 处理单词
+        now = timezone.now()
+
         def update_chIdiom(chIdiom_, is_accepted, mode="review"):
             chIdiom_.previous = now
             chIdiom_.total += 1
@@ -211,12 +208,17 @@ class ChIdiomsPerfection(models.Model):
                     self.unremembered.add(chIdiom_)
             chIdiom_.save()
 
-        now = timezone.now()
         for item in self.review.all():
             update_chIdiom(item, review[item.chIdiom.key], mode="review")
         for item in self.addition.all():
             update_chIdiom(item, addition[item.chIdiom.key], mode="addition")
         self.unremembered.distinct()
+        # 处理记忆版
+        _next = now + get_next_interval(None, 1)
+        for item in self.remember.all():
+            item.next = _next
+            item.status = ChIdiomPerfectionStatusChoices.REVIEWING
+            item.save()
         self.save()
 
     @property

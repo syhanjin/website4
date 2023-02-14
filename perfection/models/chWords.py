@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-13 0:3                                                     =
+#    @Time : 2023-2-14 22:34                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : chWords.py                                                        =
@@ -55,17 +55,12 @@ class ChWordsPerfectionManager(models.Manager):
         if perfection is None:
             raise ValueError('必须提供‘perfection’')
         # 生成随机单词
-        total, addition_count = 20, 10
+        total, addition_count = 10, 5
         if not rest:
             _next = timezone.now() + INTERVAL_UNACCEPTED_0[0]
             unremembered = perfection.chWord_perfections.filter(status=ChWordPerfectionStatusChoices.UNREMEMBERED)
             n = total - unremembered.count()
-            remember = []
-            for item in unremembered:
-                # 重置下次打卡时间
-                item.next = _next
-                item.save()
-                remember.append(item)
+            remember = list(unremembered)
             excludes = perfection.chWord_perfections.all().values_list('chWord', flat=True)
             library = QuerySet(model=ChWord)
             for lib in perfection.chWord_libraries.all():
@@ -75,7 +70,7 @@ class ChWordsPerfectionManager(models.Manager):
             if n > 0:
                 for item in library[:n]:
                     obj = ChWordPerfection.objects.create(
-                        chWord=item, status=ChWordPerfectionStatusChoices.REVIEWING, next=_next
+                        chWord=item, status=ChWordPerfectionStatusChoices.REMEMBERING
                     )
                     perfection.chWord_perfections.add(obj)
                     remember.append(obj)
@@ -186,6 +181,8 @@ class ChWordsPerfection(models.Model):
 
     def update_chWords(self, review, addition):
         # 处理单词
+        now = timezone.now()
+
         def update_chWord(chWord_, is_accepted, mode="review"):
             chWord_.previous = now
             chWord_.total += 1
@@ -212,12 +209,17 @@ class ChWordsPerfection(models.Model):
                     self.unremembered.add(chWord_)
             chWord_.save()
 
-        now = timezone.now()
         for item in self.review.all():
             update_chWord(item, review[item.chWord.random], mode="review")
         for item in self.addition.all():
             update_chWord(item, addition[item.chWord.random], mode="addition")
         self.unremembered.distinct()
+        # 处理记忆版
+        _next = now + get_next_interval(None, 1)
+        for item in self.remember.all():
+            item.next = _next
+            item.status = ChWordPerfectionStatusChoices.REVIEWING
+            item.save()
         self.save()
 
     @property
