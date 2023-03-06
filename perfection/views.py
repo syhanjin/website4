@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-13 0:2                                                     =
+#    @Time : 2023-3-7 0:5                                                      =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -287,18 +287,22 @@ class WordsPerfectionViewSet(viewsets.ModelViewSet):
         errors = {}
         review = _object.review.all()
         addition = _object.addition.all()
-        if review.count() != len(data["review"].keys()):
+        review_keys = data["review"].keys()
+        addition_keys = data["addition"].keys()
+        if review.count() != len(review_keys):
             errors['review'] = "「打卡版·正常」词量不匹配"
-        if addition.count() != len(data["addition"].keys()):
+        if addition.count() != len(addition_keys):
             errors['addition'] = "「打卡版·附加」词量不匹配"
         if len(errors.keys()) > 0:
             return Response(status=status.HTTP_400_BAD_REQUEST, data=errors)
         # 查验传入字典的单词
-        review_errors = [x for x in data['review'].keys() if x not in review.values_list('word__word', flat=True)]
+        review_db_keys = review.values_list('word__word', flat=True)
+        review_errors = [x for x in review_keys if x not in review_db_keys]
         if len(review_errors) > 0:
             errors['review'] = f"{review_errors} 不是本次「打卡版·正常」的单词"
         # print(addition.values_list('word__word', flat=True))
-        addition_errors = [x for x in data['addition'].keys() if x not in addition.values_list('word__word', flat=True)]
+        addition_db_keys = addition.values_list('word__word', flat=True)
+        addition_errors = [x for x in addition_keys if x not in addition_db_keys]
         if len(addition_errors) > 0:
             errors['addition'] = f"{addition_errors} 不是本次「打卡版·附加」的单词"
         if len(errors.keys()) > 0:
