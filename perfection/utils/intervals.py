@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-4 22:10                                                    =
+#    @Time : 2023-3-7 0:14                                                     =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : intervals.py                                                      =
@@ -29,9 +29,9 @@ INTERVAL_UNACCEPTED_1__COUNT = len(INTERVAL_UNACCEPTED_1_)
 
 
 def get_interval_count(obj):
-    if obj.count == 0:
+    if obj.unaccepted == 0:
         return INTERVAL_UNACCEPTED_0_COUNT
-    elif obj.count > 0:
+    elif obj.unaccepted > 0:
         return INTERVAL_UNACCEPTED_1__COUNT
 
 
