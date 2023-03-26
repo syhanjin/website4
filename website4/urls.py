@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-5 13:40                                                    =
+#    @Time : 2023-3-26 9:24                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : urls.py                                                           =
@@ -39,8 +39,6 @@ router.register(r'perfection/words', perfection.views.WordsPerfectionViewSet)
 router.register(r'perfection/word_libraries', perfection.views.WordLibraryViewSet)
 router.register(r'perfection/chIdioms', perfection.views.ChIdiomsPerfectionViewSet)
 router.register(r'perfection/chIdiom_libraries', perfection.views.ChIdiomLibraryViewSet)
-router.register(r'perfection/chWords', perfection.views.ChWordsPerfectionViewSet)
-router.register(r'perfection/chWord_libraries', perfection.views.ChWordLibraryViewSet)
 router.register(r'getui/cid', getui.views.CidViewSet)
 
 urlpatterns = [  # 管理员系统

@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-5 13:33                                                    =
+#    @Time : 2023-3-26 9:13                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : base.py                                                           =
@@ -16,7 +16,6 @@ from account.serializers import UserPublicSerializer
 from perfection.conf import settings
 from perfection.models.base import PerfectionStudent
 from perfection.models.chIdioms import ChIdiomLibrary
-from perfection.models.chWords import ChWordLibrary
 from perfection.models.words import WordLibrary
 
 
@@ -42,7 +41,6 @@ class PerfectionStudentSerializer(serializers.ModelSerializer):
 
     word_libraries = settings.SERIALIZERS.word_library(many=True)
     chIdiom_libraries = settings.SERIALIZERS.chIdiom_library(many=True)
-    chWord_libraries = settings.SERIALIZERS.chWord_library(many=True)
 
     has_unfinished_words_perfection = serializers.SerializerMethodField(read_only=True)
     has_missed_words_perfection = serializers.SerializerMethodField(read_only=True)
@@ -100,18 +98,5 @@ class PerfectionStudentChIdiomLibrariesSetSerializer(serializers.ModelSerializer
 
     def validate_chIdiom_libraries(self, attr):
         if ChIdiomLibrary.objects.filter(id__in=attr).count() != len(attr):
-            raise serializers.ValidationError("有不存在的词库")
-        return attr
-
-
-class PerfectionStudentChWordLibrariesSetSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PerfectionStudent
-        fields = ('chWord_libraries',)
-
-    chWord_libraries = serializers.ListField(child=serializers.UUIDField(), min_length=1)
-
-    def validate_chWord_libraries(self, attr):
-        if ChWordLibrary.objects.filter(id__in=attr).count() != len(attr):
             raise serializers.ValidationError("有不存在的词库")
         return attr

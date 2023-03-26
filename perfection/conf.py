@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-5 13:34                                                    =
+#    @Time : 2023-3-26 9:14                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : conf.py                                                           =
@@ -68,17 +68,12 @@ default_settings = {
             "chIdiom_perfection": 'perfection.serializers.chIdioms.ChIdiomPerfectionSerializer',
             "chIdiom_perfection_simple": 'perfection.serializers.chIdioms.ChIdiomPerfectionSimpleSerializer',
             "chIdiom_library": 'perfection.serializers.chIdioms.ChIdiomLibrarySerializer',
-            "chWords_perfection": "perfection.serializers.chWords.ChWordsPerfectionSerializer",
-            "chWord_perfection": 'perfection.serializers.chWords.ChWordPerfectionSerializer',
-            "chWord_perfection_simple": 'perfection.serializers.chWords.ChWordPerfectionSimpleSerializer',
-            "chWord_library": 'perfection.serializers.chWords.ChWordLibrarySerializer',
         }
     ),
     "MODELS": ObjDict(
         {
             "words_perfection": "perfection.models.words.WordsPerfection",
             "chIdioms_perfection": "perfection.models.chIdioms.ChIdiomsPerfection",
-            "chWords_perfection": "perfection.models.chWords.ChWordsPerfection",
         }
     ),
     "CHOICES": ObjDict(
@@ -87,8 +82,6 @@ default_settings = {
             "words_perfection_status": "perfection.models.words.WordsPerfectionStatusChoices",
             "chIdiom_perfection_status": "perfection.models.chIdioms.ChIdiomPerfectionStatusChoices",
             "chIdioms_perfection_status": "perfection.models.chIdioms.ChIdiomsPerfectionStatusChoices",
-            "chWord_perfection_status": "perfection.models.chWords.ChWordPerfectionStatusChoices",
-            "chWords_perfection_status": "perfection.models.chWords.ChWordsPerfectionStatusChoices",
         }
     )
 }

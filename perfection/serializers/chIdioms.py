@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-5 12:20                                                    =
+#    @Time : 2023-3-26 9:22                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : chIdioms.py                                                       =
@@ -133,7 +133,7 @@ class ChIdiomsPerfectionFinishSerializer(serializers.ModelSerializer):
     # remember = serializers.DictField(child=serializers.BooleanField())
     review = serializers.DictField(child=serializers.BooleanField())
     addition = serializers.DictField(child=serializers.BooleanField())
-    picture = serializers.ListField(child=Base64ImageField(), max_length=3, min_length=1)
+    picture = serializers.ListField(child=Base64ImageField(), max_length=5, min_length=0)
 
     class Meta:
         model = ChIdiomsPerfection

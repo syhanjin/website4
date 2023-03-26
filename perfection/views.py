@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-3-7 0:5                                                      =
+#    @Time : 2023-3-26 9:12                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -22,16 +22,13 @@ from rest_framework.response import Response
 from images.models import Image
 from perfection.models.base import PerfectionStudent
 from perfection.serializers.base import (
-    PerfectionStudentChIdiomLibrariesSetSerializer, PerfectionStudentChWordLibrariesSetSerializer,
-    PerfectionStudentCreateSerializer, PerfectionStudentSerializer,
+    PerfectionStudentChIdiomLibrariesSetSerializer, PerfectionStudentCreateSerializer, PerfectionStudentSerializer,
     PerfectionStudentWordLibrariesSetSerializer,
 )
 from perfection.utils.build_chIdiom_pdf import to_pdf as to_chIdiom_pdf
-from perfection.utils.build_chWord_pdf import to_pdf as to_chWord_pdf
 from perfection.utils.build_word_pdf import to_pdf as to_word_pdf
 from .conf import settings
 from .models.chIdioms import ChIdiomLibrary, ChIdiomsPerfection
-from .models.chWords import ChWordLibrary, ChWordsPerfection
 from .models.words import WordLibrary, WordsPerfection
 from .serializers.chIdioms import (
     ChIdiomLibrarySerializer, ChIdiomsPerfectionAdditionSerializer, ChIdiomsPerfectionAllChIdiomsSerializer,
@@ -39,12 +36,6 @@ from .serializers.chIdioms import (
     ChIdiomsPerfectionListSerializer,
     ChIdiomsPerfectionRememberSerializer,
     ChIdiomsPerfectionReviewSerializer, ChIdiomsPerfectionSerializer, ChIdiomsPerfectionUnrememberedSerializer,
-)
-from .serializers.chWords import (
-    ChWordLibrarySerializer, ChWordsPerfectionAdditionSerializer, ChWordsPerfectionAllChWordsSerializer,
-    ChWordsPerfectionFinishSerializer, ChWordsPerfectionListSerializer,
-    ChWordsPerfectionRememberSerializer, ChWordsPerfectionReviewSerializer, ChWordsPerfectionSerializer,
-    ChWordsPerfectionUnrememberedSerializer,
 )
 from .serializers.words import (
     WordLibrarySerializer, WordsPerfectionAdditionSerializer, WordsPerfectionAllWordsSerializer,
@@ -96,8 +87,6 @@ class PerfectionStudentViewSet(viewsets.ModelViewSet):
             return PerfectionStudentWordLibrariesSetSerializer
         elif self.action == 'set_chIdioms_library':
             return PerfectionStudentChIdiomLibrariesSetSerializer
-        elif self.action == 'set_chWords_library':
-            return PerfectionStudentChWordLibrariesSetSerializer
         return super().get_serializer_class()
 
     def get_permissions(self):
@@ -107,8 +96,6 @@ class PerfectionStudentViewSet(viewsets.ModelViewSet):
             self.permission_classes = settings.PERMISSIONS.words_library_set
         elif self.action == 'set_chIdioms_library':
             self.permission_classes = settings.PERMISSIONS.chIdioms_library_set
-        elif self.action == 'set_chWords_library':
-            self.permission_classes = settings.PERMISSIONS.chWords_library_set
         elif self.action == "me":
             self.permission_classes = settings.PERMISSIONS.student
         return super().get_permissions()
@@ -159,18 +146,6 @@ class PerfectionStudentViewSet(viewsets.ModelViewSet):
         _object.save()
         return Response(
             data={'chIdiom_libraries': list(_object.chIdiom_libraries.all().values_list('name', flat=True))}
-        )
-
-    @action(methods=['post'], detail=False)
-    def set_chWords_library(self, request, *args, **kwargs):
-        _object = self.get_instance().perfection
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        libraries = ChWordLibrary.objects.filter(id__in=serializer.validated_data['chWord_libraries'])
-        _object.chWord_libraries.set(libraries)
-        _object.save()
-        return Response(
-            data={'chWord_libraries': list(_object.chWord_libraries.all().values_list('name', flat=True))}
         )
 
 
@@ -499,168 +474,4 @@ class ChIdiomLibraryViewSet(viewsets.ModelViewSet):
     serializer_class = ChIdiomLibrarySerializer
     queryset = ChIdiomLibrary.objects.all()
     permission_classes = settings.PERMISSIONS.chIdiom_libraries
-    lookup_field = 'id'
-
-
-# 语文文言字词打卡
-
-class ChWordsPagination(PageNumberPagination):
-    # 默认的大小
-    page_size = 20
-    page_size_query_param = 'page_size'
-    max_page_size = 30
-
-
-class ChWordsPerfectionViewSet(viewsets.ModelViewSet):
-    serializer_class = ChWordsPerfectionSerializer
-    queryset = ChWordsPerfection.objects.all()
-    permission_classes = settings.PERMISSIONS.chWords
-    lookup_field = 'id'
-    pagination_class = ChWordsPagination
-
-    def get_queryset(self):
-        user = self.request.user
-        # if user.perfection.role == 'teacher':
-        #     queryset = super().get_queryset()
-        # else:
-        queryset = user.perfection.chWords.all()
-        return queryset
-
-    def get_serializer_class(self):
-        if self.action == 'list':
-            return ChWordsPerfectionListSerializer
-        elif self.action == 'remember' or self.action == 'remember_file':
-            return ChWordsPerfectionRememberSerializer
-        elif self.action == 'review' or self.action == 'review_file':
-            return ChWordsPerfectionReviewSerializer
-        elif self.action == 'addition':
-            return ChWordsPerfectionAdditionSerializer
-        elif self.action == 'unremembered':
-            return ChWordsPerfectionUnrememberedSerializer
-        elif self.action == 'all_chWords':
-            return ChWordsPerfectionAllChWordsSerializer
-        elif self.action == 'finish':
-            return ChWordsPerfectionFinishSerializer
-        return super().get_serializer_class()
-
-    def get_permissions(self):
-        if self.action == 'create':
-            self.permission_classes = settings.PERMISSIONS.chWords_create
-        elif self.action in ['remember', 'review', 'remember_file', 'review_file', 'unremembered',
-                             'addition', 'all_chWords']:
-            self.permission_classes = settings.PERMISSIONS.chWords
-        elif self.action == 'finish':
-            self.permission_classes = settings.PERMISSIONS.chWords_finish
-        return super().get_permissions()
-
-    def get_instance(self):
-        return self.request.user
-
-    @action(methods=['get', 'post'], detail=True)
-    def remember(self, request, *args, **kwargs):
-        serializer = self.get_serializer(instance=self.get_object())
-        return Response(data=serializer.data, status=status.HTTP_200_OK)
-
-    @action(methods=['get', 'post'], detail=True)
-    def unremembered(self, request, *args, **kwargs):
-        serializer = self.get_serializer(instance=self.get_object())
-        return Response(data=serializer.data, status=status.HTTP_200_OK)
-
-    @action(methods=['get', 'post'], detail=True)
-    def review(self, request, *args, **kwargs):
-        serializer = self.get_serializer(instance=self.get_object())
-        data = serializer.data
-        if request.query_params.get('simple'):
-            data['review'] = [x['key'] for x in data['review']]
-        return Response(data=data, status=status.HTTP_200_OK)
-
-    @action(methods=['get', 'post'], detail=True)
-    def addition(self, request, *args, **kwargs):
-        serializer = self.get_serializer(instance=self.get_object())
-        data = serializer.data
-        if request.query_params.get('simple'):
-            data['addition'] = [x['key'] for x in data['addition']]
-        return Response(data=data, status=status.HTTP_200_OK)
-
-    @action(methods=['get'], detail=True)
-    def remember_file(self, request, *args, **kwargs):
-        instance = self.get_object()
-        return to_pdf_resp(instance.remember.all(), to_chWord_pdf, instance.updated, mode='remember')
-
-    @action(methods=['get'], detail=True)
-    def review_file(self, request, *args, **kwargs):
-        instance = self.get_object()
-        chWords = list(instance.review.all())
-        addition = list(instance.addition.all())
-        random.shuffle(chWords)
-        random.shuffle(addition)
-        return to_pdf_resp(chWords, to_chWord_pdf, instance.updated, addition=addition, mode='review')
-
-    @action(methods=['get'], detail=True)
-    def all_chWords(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance=instance)
-        data = serializer.data
-        return Response(data=data, status=status.HTTP_200_OK)
-
-    @action(methods=['post'], detail=True)
-    def finish(self, request, *args, **kwargs):
-        _object = self.get_object()
-        if _object.status == settings.CHOICES.chWords_perfection_status.FINISHED:
-            # 伪造drf验证返回值
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={'non_field_errors': ['打卡已完成']})
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
-        errors = {}
-        review = _object.review.all()
-        addition = _object.addition.all()
-        if review.count() != len(data["review"].keys()):
-            errors['review'] = "「打卡版·正常」词量不匹配"
-        if addition.count() != len(data["addition"].keys()):
-            errors['addition'] = "「打卡版·附加」词量不匹配"
-        if len(errors.keys()) > 0:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=errors)
-        # 查验传入字典的单词
-        review_errors = [x for x in data['review'].keys() if x not in review.values_list('chWord__random', flat=True)]
-        if len(review_errors) > 0:
-            errors['review'] = f"{review_errors} 不是本次「打卡版·正常」的单词"
-        addition_errors = [x for x in data['addition'].keys() if
-                           x not in addition.values_list('chWord__random', flat=True)]
-        if len(addition_errors) > 0:
-            errors['addition'] = f"{addition_errors} 不是本次「打卡版·附加」的单词"
-        if len(errors.keys()) > 0:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=errors)
-        _object.update_chWords(
-            review=data['review'],
-            addition=data['addition']
-        )
-        # _object.picture = data['picture']
-        # 处理图片问题
-        for pic in data['picture']:
-            image = Image.objects.create(image=pic)
-            _object.picture.add(image)
-        #
-        _object.status = settings.CHOICES.chWords_perfection_status.FINISHED
-        _object.finished = timezone.now()
-        _object.save()
-        picture = []
-        for pic in _object.picture.all():
-            picture.append(request.build_absolute_uri(pic.image.url))
-        return Response(
-            status=status.HTTP_200_OK, data={
-                "accuracy": _object.accuracy,
-                "total": _object.total,
-                "picture": picture,
-                "unremembered_chWords": _object.unremembered_chWords.values_list(
-                    'chWord__key', 'chWord__sentence', 'chWord__value'
-                )
-            }
-        )
-
-
-class ChWordLibraryViewSet(viewsets.ModelViewSet):
-    serializer_class = ChWordLibrarySerializer
-    queryset = ChWordLibrary.objects.all()
-    permission_classes = settings.PERMISSIONS.chWord_libraries
     lookup_field = 'id'

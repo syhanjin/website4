@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-4 23:29                                                    =
+#    @Time : 2023-3-26 9:22                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -136,7 +136,7 @@ class WordsPerfectionFinishSerializer(serializers.ModelSerializer):
     # remember = serializers.DictField(child=serializers.BooleanField())
     review = serializers.DictField(child=serializers.BooleanField())
     addition = serializers.DictField(child=serializers.BooleanField())
-    picture = serializers.ListField(child=Base64ImageField(), max_length=3, min_length=1)
+    picture = serializers.ListField(child=Base64ImageField(), max_length=5, min_length=0)
 
     class Meta:
         model = WordsPerfection

@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-5 13:32                                                    =
+#    @Time : 2023-3-26 9:56                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : base.py                                                           =
@@ -42,18 +42,11 @@ class PerfectionStudent(models.Model):
     chIdiom_libraries = models.ManyToManyField(
         'perfection.chIdiomLibrary', verbose_name="成语词库", related_name='libraries_perfection'
     )
-
-    chWord_perfections = models.ManyToManyField(
-        'perfection.chWordPerfection', related_name="perfection_student"
-    )
-    chWord_libraries = models.ManyToManyField(
-        'perfection.chWordLibrary', verbose_name="成语词库", related_name='libraries_perfection'
-    )
     role = 'student'
     objects = PerfectionStudentManager()
 
     SUMMARY_FIELDS = [
-        'id', 'user', 'role', 'word_libraries', 'chIdiom_libraries', 'chWord_libraries'
+        'id', 'user', 'role', 'word_libraries', 'chIdiom_libraries'
     ]
 
     def __unicode__(self):
@@ -67,11 +60,6 @@ class PerfectionStudent(models.Model):
     def get_review_chIdioms(self) -> QuerySet:
         return self.chIdiom_perfections.filter(
             status=settings.CHOICES.chIdiom_perfection_status.REVIEWING, next__lte=timezone.now()
-        )
-
-    def get_review_chWords(self) -> QuerySet:
-        return self.chWord_perfections.filter(
-            status=settings.CHOICES.chWord_perfection_status.REVIEWING, next__lte=timezone.now()
         )
 
     @property
