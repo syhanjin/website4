@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-2-14 22:34                                                   =
+#    @Time : 2023-3-31 22:51                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -162,6 +162,9 @@ class WordsPerfection(models.Model):
     picture = models.ManyToManyField('images.Image', verbose_name="打卡内容图片", related_name="words")
 
     # accepted = models.FloatField(default=0)
+    # 在数据库中保存一部分东西，加快反应速度
+    total = models.PositiveIntegerField(default=0)
+    unaccepted = models.PositiveIntegerField(default=0)
 
     created = models.DateTimeField(verbose_name="生成打卡任务时间", auto_now_add=True, editable=False)
     updated = models.DateTimeField(verbose_name="打卡任务更新时间", auto_now=True, editable=True)
@@ -229,12 +232,17 @@ class WordsPerfection(models.Model):
     def unremembered_words(self) -> QuerySet:
         return self.unremembered.all()
 
-    @property
-    def unaccepted(self) -> int:
+    def refresh_counts(self):
+        self.total = self.get_total()
+        self.unaccepted = self.get_unaccepted()
+        self.save()
+
+    # @property
+    def get_unaccepted(self) -> int:
         return self.unremembered_words.count()
 
-    @property
-    def total(self) -> int:
+    # @property
+    def get_total(self) -> int:
         return self.review.count()
 
     @property

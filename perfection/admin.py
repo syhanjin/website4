@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-3-26 11:17                                                   =
+#    @Time : 2023-3-31 22:51                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -66,6 +66,13 @@ def _create_remind(data, alias, group_name):
         "group_name": group_name,
         "alias": alias
     }
+
+
+def refresh_counts():
+    for item in WordsPerfection.objects.all():
+        item.refresh_counts()
+    for item in ChIdiomsPerfection.objects.all():
+        item.refresh_counts()
 
 
 def create_words_perfection(is_rest, perfection, date_str):
