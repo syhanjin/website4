@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-3-31 22:52                                                   =
+#    @Time : 2023-3-31 23:8                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : chIdioms.py                                                       =
@@ -92,6 +92,7 @@ class ChIdiomsPerfectionManager(models.Manager):
         chIdioms_perfection.review.add(*review)
         chIdioms_perfection.remember.add(*remember)
         chIdioms_perfection.addition.add(*addition)
+        chIdioms_perfection.refresh_counts()
         chIdioms_perfection.save()
         perfection.save()
         return chIdioms_perfection
@@ -161,7 +162,8 @@ class ChIdiomsPerfection(models.Model):
     unaccepted = models.PositiveIntegerField(default=0)
 
     created = models.DateTimeField(verbose_name="生成打卡任务时间", auto_now_add=True, editable=False)
-    updated = models.DateTimeField(verbose_name="打卡任务更新时间", auto_now=True, editable=True)
+    # 更新时间手动刷新，避免出错
+    updated = models.DateTimeField(verbose_name="打卡任务更新时间", auto_now_add=True, editable=True)
     finished = models.DateTimeField(verbose_name="完成打卡任务时间", null=True)
 
     status = models.TextField(
@@ -230,7 +232,7 @@ class ChIdiomsPerfection(models.Model):
     def refresh_counts(self):
         self.total = self.get_total()
         self.unaccepted = self.get_unaccepted()
-        self.save()
+        # self.save()
 
     # @property
     def get_unaccepted(self) -> int:

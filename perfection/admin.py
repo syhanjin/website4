@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-3-31 22:51                                                   =
+#    @Time : 2023-3-31 23:8                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : admin.py                                                          =
@@ -71,8 +71,10 @@ def _create_remind(data, alias, group_name):
 def refresh_counts():
     for item in WordsPerfection.objects.all():
         item.refresh_counts()
+        item.save()
     for item in ChIdiomsPerfection.objects.all():
         item.refresh_counts()
+        item.save()
 
 
 def create_words_perfection(is_rest, perfection, date_str):
@@ -106,7 +108,9 @@ def create_words_perfections():
         # print(perfection)
         # 首先获取最后一次打卡
         latest = perfection.get_latest(perfection.words)
-        if not latest or latest.status == settings.CHOICES.words_perfection_status.FINISHED:
+        if not latest or (
+                latest.status == settings.CHOICES.words_perfection_status.FINISHED
+                and latest.finished.date() != now.date()):
             res = create_words_perfection(is_rest, perfection, date_str)
             if res is None:
                 continue
@@ -169,7 +173,9 @@ def create_chIdioms_perfections():
         # print(perfection)
         # 首先获取最后一次打卡
         latest = perfection.get_latest(perfection.chIdioms)
-        if not latest or latest.status == settings.CHOICES.chIdioms_perfection_status.FINISHED:
+        if not latest or (
+                latest.status == settings.CHOICES.chIdioms_perfection_status.FINISHED
+                and latest.finished.date() != now.date()):
             ChIdiomsPerfection.objects.create(rest=is_rest, perfection=perfection)
             add_cnt += 1
         elif latest.status == settings.CHOICES.chIdioms_perfection_status.UNFINISHED and latest.updated.date() < now.date():

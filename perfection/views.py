@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-3-26 9:12                                                    =
+#    @Time : 2023-3-31 23:8                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -294,6 +294,7 @@ class WordsPerfectionViewSet(viewsets.ModelViewSet):
         #
         _object.status = settings.CHOICES.words_perfection_status.FINISHED
         _object.finished = timezone.now()
+        _object.refresh_counts()
         _object.save()
         picture = []
         for pic in _object.picture.all():
@@ -456,6 +457,7 @@ class ChIdiomsPerfectionViewSet(viewsets.ModelViewSet):
         #
         _object.status = settings.CHOICES.chIdioms_perfection_status.FINISHED
         _object.finished = timezone.now()
+        _object.refresh_counts()
         _object.save()
         picture = []
         for pic in _object.picture.all():
