@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-3-31 23:8                                                    =
+#    @Time : 2023-4-2 11:58                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : words.py                                                          =
@@ -212,8 +212,8 @@ class WordsPerfection(models.Model):
                 word_.status = WordPerfectionStatusChoices.UNREMEMBERED
                 word_.count = 0
                 word_.known = False
-                word_.unaccepted += 1
                 if mode == "review":
+                    word_.unaccepted += 1
                     self.unremembered.add(word_)
             word_.save()
 

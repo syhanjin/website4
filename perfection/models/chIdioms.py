@@ -2,7 +2,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-3-31 23:8                                                    =
+#    @Time : 2023-4-2 11:58                                                    =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : chIdioms.py                                                       =
@@ -207,8 +207,8 @@ class ChIdiomsPerfection(models.Model):
                 chIdiom_.status = ChIdiomPerfectionStatusChoices.UNREMEMBERED
                 chIdiom_.count = 0
                 chIdiom_.known = False
-                chIdiom_.unaccepted += 1
                 if mode == "review":
+                    chIdiom_.unaccepted += 1
                     self.unremembered.add(chIdiom_)
             chIdiom_.save()
 
