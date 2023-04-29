@@ -3,7 +3,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-1-29 19:7                                                    =
+#    @Time : 2023-4-29 11:13                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : serializers.py                                                    =
@@ -74,6 +74,7 @@ class AppVersionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     author = serializers.SerializerMethodField(read_only=True)
+    apk = serializers.FileField(source="installer")
 
     def get_author(self, obj):
         return {
@@ -95,7 +96,7 @@ class AppVersionCreateSerializer(serializers.ModelSerializer):
 
     app_id = serializers.UUIDField()
     is_force = serializers.ChoiceField(choices=['true', 'false'])
-    apk = serializers.FileField()
+    installer = serializers.FileField()
 
     def validate(self, attrs):
         if not App.objects.filter(id=attrs["app_id"]).exists():

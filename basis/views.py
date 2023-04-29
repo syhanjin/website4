@@ -1,12 +1,15 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-1-29 23:33                                                   =
+#    @Time : 2023-4-29 11:20                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
 #    @Program: website                                                         =
 # ==============================================================================
+import os
+
+from django.http import FileResponse
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -142,8 +145,9 @@ class AppViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         app = App.objects.get(id=data['app_id'])
-        apk = data['apk']
-        apk.name = f"{app.name}-{data['version_name']}.apk"
+        installer = data['installer']
+        ext = os.path.splitext(installer.name)[1]
+        installer.name = f"{app.name}-{data['version_name']}{ext}"
         version = AppVersion.objects.create(
             app=app,
             version_name=data['version_name'],
@@ -151,9 +155,12 @@ class AppViewSet(viewsets.ModelViewSet):
             updates=data['updates'],
             is_force=data['is_force'] == 'true',
             author=user,
-            apk=apk,
+            installer=installer,
         )
-        return Response(status=status.HTTP_200_OK, data={'apk': request.build_absolute_uri(version.apk.url)})
+        url = request.build_absolute_uri(version.installer.url)
+        return Response(
+            status=status.HTTP_200_OK, data={'installer': url, 'apk': url}
+        )
 
     @action(methods=['get'], detail=True)
     def latest(self, request, *args, **kwargs):
@@ -169,3 +176,16 @@ class AppViewSet(viewsets.ModelViewSet):
                 data["updates"] += f"# {version.version_name}\n{version.updates}\n"
 
         return Response(status=status.HTTP_200_OK, data=data)
+
+    @action(methods=['get'], detail=True)
+    def get_latest_installer(self, request, *args, **kwargs):
+        app = self.get_object()
+        latest = app.versions.all().first()
+        resp = FileResponse(latest.installer, as_attachment=True)
+        resp.headers["Access-Control-Expose-Headers"] = 'Content-Disposition'
+        return resp
+
+    @action(methods=['get'], detail=True)
+    def get_latest_apk(self, *args, **kwargs):
+        """由于历史原因，保留该函数"""
+        return self.get_latest_installer(*args, **kwargs)
