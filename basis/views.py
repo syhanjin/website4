@@ -1,7 +1,7 @@
 # ==============================================================================
 #  Copyright (C) 2023 Sakuyark, Inc. All Rights Reserved                       =
 #                                                                              =
-#    @Time : 2023-4-29 11:20                                                   =
+#    @Time : 2023-4-29 15:22                                                   =
 #    @Author : hanjin                                                          =
 #    @Email : 2819469337@qq.com                                                =
 #    @File : views.py                                                          =
@@ -9,7 +9,7 @@
 # ==============================================================================
 import os
 
-from django.http import FileResponse
+from django.http import HttpResponseRedirect
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -181,9 +181,10 @@ class AppViewSet(viewsets.ModelViewSet):
     def get_latest_installer(self, request, *args, **kwargs):
         app = self.get_object()
         latest = app.versions.all().first()
-        resp = FileResponse(latest.installer, as_attachment=True)
-        resp.headers["Access-Control-Expose-Headers"] = 'Content-Disposition'
-        return resp
+        # resp = FileResponse(latest.installer, as_attachment=True)
+        # resp.headers["Access-Control-Expose-Headers"] = 'Content-Disposition'
+        url = request.build_absolute_uri(latest.installer.url)
+        return HttpResponseRedirect(url)
 
     @action(methods=['get'], detail=True)
     def get_latest_apk(self, *args, **kwargs):
